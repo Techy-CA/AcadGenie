@@ -442,3 +442,259 @@ function showNotification(message, type = 'success') {
 
 const savedTheme = localStorage.getItem('theme') || 'light';
 document.documentElement.setAttribute('data-theme', savedTheme);
+
+// Import/Export/Backup Functions
+
+// CSV Import
+function handleCsvImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        const csv = event.target.result;
+        const lines = csv.split('\n');
+        
+        let imported = 0;
+        const promises = [];
+        
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            
+            const values = lines[i].split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+            const achievementData = {
+                type: values[0] || 'achievement',
+                title: values[1] || 'Untitled',
+                description: values[2] || '',
+                date: values[3] || new Date().toISOString().split('T')[0],
+                grade: values[4] || '',
+                institution: values[5] || '',
+                category: values[6] || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            promises.push(
+                db.collection('users').doc(currentUser.uid).collection('achievements').add(achievementData)
+            );
+            imported++;
+        }
+
+        Promise.all(promises)
+            .then(() => {
+                closeImportModal();
+                showNotification(`Successfully imported ${imported} entries!`);
+                e.target.value = '';
+            })
+            .catch(error => showNotification('Import error: ' + error.message, 'error'));
+    };
+    reader.readAsText(file);
+}
+
+// JSON Import
+function handleJsonImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(event) {
+        try {
+            const imported = JSON.parse(event.target.result);
+            if (!Array.isArray(imported)) {
+                showNotification('Invalid JSON format. Expected an array.', 'error');
+                return;
+            }
+
+            const promises = [];
+            imported.forEach(entry => {
+                const achievementData = {
+                    type: entry.type || 'achievement',
+                    title: entry.title || 'Untitled',
+                    description: entry.description || '',
+                    date: entry.date || new Date().toISOString().split('T')[0],
+                    grade: entry.grade || '',
+                    institution: entry.institution || '',
+                    category: entry.category || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                promises.push(
+                    db.collection('users').doc(currentUser.uid).collection('achievements').add(achievementData)
+                );
+            });
+
+            Promise.all(promises)
+                .then(() => {
+                    closeImportModal();
+                    showNotification(`Successfully imported ${imported.length} entries!`);
+                    e.target.value = '';
+                })
+                .catch(error => showNotification('Import error: ' + error.message, 'error'));
+        } catch (error) {
+            showNotification('Error parsing JSON file.', 'error');
+        }
+    };
+    reader.readAsText(file);
+}
+
+// JSON Paste Import
+function handleJsonPaste() {
+    const jsonText = document.getElementById('jsonTextInput').value;
+    if (!jsonText.trim()) {
+        showNotification('Please paste JSON data first.', 'error');
+        return;
+    }
+
+    try {
+        const imported = JSON.parse(jsonText);
+        if (!Array.isArray(imported)) {
+            showNotification('Invalid JSON format. Expected an array.', 'error');
+            return;
+        }
+
+        const promises = [];
+        imported.forEach(entry => {
+            const achievementData = {
+                type: entry.type || 'achievement',
+                title: entry.title || 'Untitled',
+                description: entry.description || '',
+                date: entry.date || new Date().toISOString().split('T')[0],
+                grade: entry.grade || '',
+                institution: entry.institution || '',
+                category: entry.category || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            promises.push(
+                db.collection('users').doc(currentUser.uid).collection('achievements').add(achievementData)
+            );
+        });
+
+        Promise.all(promises)
+            .then(() => {
+                closeImportModal();
+                document.getElementById('jsonTextInput').value = '';
+                showNotification(`Successfully imported ${imported.length} entries!`);
+            })
+            .catch(error => showNotification('Import error: ' + error.message, 'error'));
+    } catch (error) {
+        showNotification('Error parsing JSON data.', 'error');
+    }
+}
+
+// Export to CSV
+function exportToCsv() {
+    if (achievements.length === 0) {
+        showNotification('No data to export.', 'error');
+        return;
+    }
+    
+    const csv = convertToCSV(achievements);
+    downloadFile(csv, 'academic-achievements.csv', 'text/csv');
+    closeExportModal();
+    showNotification('Data exported to CSV successfully!');
+}
+
+// Export to JSON
+function exportToJson() {
+    if (achievements.length === 0) {
+        showNotification('No data to export.', 'error');
+        return;
+    }
+    
+    const json = JSON.stringify(achievements, null, 2);
+    downloadFile(json, 'academic-achievements.json', 'application/json');
+    closeExportModal();
+    showNotification('Data exported to JSON successfully!');
+}
+
+// Export Filtered Data
+function exportFiltered() {
+    if (filteredAchievements.length === 0) {
+        showNotification('No data to export.', 'error');
+        return;
+    }
+    
+    const json = JSON.stringify(filteredAchievements, null, 2);
+    downloadFile(json, 'filtered-achievements.json', 'application/json');
+    closeExportModal();
+    showNotification(`Exported ${filteredAchievements.length} filtered entries!`);
+}
+
+// Convert to CSV Helper
+function convertToCSV(data) {
+    const headers = ['type', 'title', 'description', 'date', 'grade', 'institution', 'category'];
+    const csvRows = [headers.join(',')];
+    
+    data.forEach(item => {
+        const values = headers.map(header => {
+            const value = item[header] || '';
+            return `"${value.toString().replace(/"/g, '""')}"`;
+        });
+        csvRows.push(values.join(','));
+    });
+    
+    return csvRows.join('\n');
+}
+
+// Download File Helper
+function downloadFile(content, filename, contentType) {
+    const blob = new Blob([content], { type: contentType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Download CSV Template
+function downloadCsvTemplate() {
+    const template = 'type,title,description,date,grade,institution,category\nachievement,Example Achievement,This is a sample description,2025-01-15,A+,University Name,Computer Science';
+    downloadFile(template, 'template.csv', 'text/csv');
+    showNotification('CSV template downloaded!');
+}
+
+// Download JSON Template
+function downloadJsonTemplate() {
+    const template = [
+        {
+            type: 'achievement',
+            title: 'Example Achievement',
+            description: 'This is a sample description',
+            date: '2025-01-15',
+            grade: 'A+',
+            institution: 'University Name',
+            category: 'Computer Science'
+        }
+    ];
+    const json = JSON.stringify(template, null, 2);
+    downloadFile(json, 'template.json', 'application/json');
+    showNotification('JSON template downloaded!');
+}
+
+// Create Backup
+function createBackup() {
+    if (achievements.length === 0) {
+        showNotification('No data to backup.', 'error');
+        return;
+    }
+    
+    const backup = {
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        user: currentUser.displayName || currentUser.email,
+        userId: currentUser.uid,
+        totalEntries: achievements.length,
+        data: achievements
+    };
+    
+    const json = JSON.stringify(backup, null, 2);
+    const filename = `backup_${currentUser.displayName || 'user'}_${new Date().toISOString().split('T')[0]}.json`;
+    downloadFile(json, filename, 'application/json');
+    showNotification('Backup created successfully!');
+}
