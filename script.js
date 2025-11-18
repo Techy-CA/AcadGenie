@@ -170,6 +170,7 @@ function updatePersonalization() {
 
 function initializeDashboard() { renderAchievements(); updateStats(); updateView(); }
 
+// DOM Elements
 const addBtn = document.getElementById('addBtn');
 const addModal = document.getElementById('addModal');
 const closeBtn = document.getElementById('closeBtn');
@@ -183,11 +184,16 @@ const themeToggle = document.getElementById('themeToggle');
 const menuToggle = document.getElementById('menuToggle');
 const mainNav = document.getElementById('mainNav');
 const logoutBtn = document.getElementById('logoutBtn');
+const importBtn = document.getElementById('importBtn');
+const exportBtn = document.getElementById('exportBtn');
+const backupBtn = document.getElementById('backupBtn');
+const printBtn = document.getElementById('printBtn');
 const importModal = document.getElementById('importModal');
 const exportModal = document.getElementById('exportModal');
 const closeImportBtn = document.getElementById('closeImportBtn');
 const closeExportBtn = document.getElementById('closeExportBtn');
 
+// Event Listeners
 document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
 document.getElementById('registerFormElement').addEventListener('submit', handleRegister);
 document.getElementById('showRegisterLink').addEventListener('click', (e) => { e.preventDefault(); showRegister(); });
@@ -200,6 +206,29 @@ if (closeExportBtn) closeExportBtn.addEventListener('click', closeExportModal);
 
 document.getElementById('logoutCancel')?.addEventListener('click', closeLogoutModal);
 document.getElementById('logoutConfirm')?.addEventListener('click', confirmLogout);
+
+// Import/Export/Backup Event Listeners
+if (importBtn) importBtn.addEventListener('click', () => importModal.classList.add('active'));
+if (exportBtn) exportBtn.addEventListener('click', () => exportModal.classList.add('active'));
+if (backupBtn) backupBtn.addEventListener('click', createBackup);
+if (printBtn) printBtn.addEventListener('click', () => window.print());
+
+document.getElementById('uploadCsvBtn')?.addEventListener('click', () => {
+    document.getElementById('csvFileInput').click();
+});
+
+document.getElementById('csvFileInput')?.addEventListener('change', handleCsvImport);
+document.getElementById('jsonFileInput')?.addEventListener('change', handleJsonImport);
+document.getElementById('pasteJsonBtn')?.addEventListener('click', handleJsonPaste);
+document.getElementById('uploadJsonBtn')?.addEventListener('click', () => {
+    document.getElementById('jsonFileInput').click();
+});
+
+document.getElementById('exportCsvBtn')?.addEventListener('click', exportToCsv);
+document.getElementById('exportJsonBtn')?.addEventListener('click', exportToJson);
+document.getElementById('exportFilteredBtn')?.addEventListener('click', exportFiltered);
+document.getElementById('downloadCsvTemplate')?.addEventListener('click', downloadCsvTemplate);
+document.getElementById('downloadJsonTemplate')?.addEventListener('click', downloadJsonTemplate);
 
 window.addEventListener('click', (e) => {
     if (e.target === addModal) closeModal();
@@ -241,6 +270,7 @@ document.getElementById('confirmDelete')?.addEventListener('click', () => {
     closeConfirmModal();
 });
 
+// Modal Functions
 function openModal(achievement = null) {
     if (achievement) {
         document.getElementById('modalTitle').textContent = 'Edit Entry';
@@ -269,7 +299,13 @@ function openLogoutModal() { document.getElementById('logoutModal').classList.ad
 function closeLogoutModal() { document.getElementById('logoutModal').classList.remove('active'); }
 function openConfirmModal(callback) { deleteConfirmCallback = callback; document.getElementById('confirmModal').classList.add('active'); }
 function closeConfirmModal() { document.getElementById('confirmModal').classList.remove('active'); deleteConfirmCallback = null; }
-function editAchievement(id) { const achievement = achievements.find(a => a.id === id); if (achievement) openModal(achievement); closeAllDropdowns(); }
+
+function editAchievement(id) { 
+    const achievement = achievements.find(a => a.id === id); 
+    if (achievement) openModal(achievement); 
+    closeAllDropdowns(); 
+}
+
 function toggleDropdown(id) {
     document.querySelectorAll('.card-menu-dropdown').forEach(dropdown => {
         if (dropdown.id !== `dropdown-${id}`) dropdown.classList.remove('active');
@@ -277,12 +313,17 @@ function toggleDropdown(id) {
     const dropdown = document.getElementById(`dropdown-${id}`);
     if (dropdown) dropdown.classList.toggle('active');
 }
-function closeAllDropdowns() { document.querySelectorAll('.card-menu-dropdown').forEach(dropdown => dropdown.classList.remove('active')); }
+
+function closeAllDropdowns() { 
+    document.querySelectorAll('.card-menu-dropdown').forEach(dropdown => dropdown.classList.remove('active')); 
+}
+
 function formatDate(dateString) {
     if (!dateString) return 'N/A';
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(dateString).toLocaleDateString('en-US', options);
 }
+
 function sortAchievements(data) {
     return data.sort((a, b) => {
         switch(currentSort) {
@@ -440,12 +481,7 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-const savedTheme = localStorage.getItem('theme') || 'light';
-document.documentElement.setAttribute('data-theme', savedTheme);
-
 // Import/Export/Backup Functions
-
-// CSV Import
 function handleCsvImport(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -491,7 +527,6 @@ function handleCsvImport(e) {
     reader.readAsText(file);
 }
 
-// JSON Import
 function handleJsonImport(e) {
     const file = e.target.files[0];
     if (!file) return;
@@ -538,7 +573,6 @@ function handleJsonImport(e) {
     reader.readAsText(file);
 }
 
-// JSON Paste Import
 function handleJsonPaste() {
     const jsonText = document.getElementById('jsonTextInput').value;
     if (!jsonText.trim()) {
@@ -584,7 +618,6 @@ function handleJsonPaste() {
     }
 }
 
-// Export to CSV
 function exportToCsv() {
     if (achievements.length === 0) {
         showNotification('No data to export.', 'error');
@@ -597,7 +630,6 @@ function exportToCsv() {
     showNotification('Data exported to CSV successfully!');
 }
 
-// Export to JSON
 function exportToJson() {
     if (achievements.length === 0) {
         showNotification('No data to export.', 'error');
@@ -610,7 +642,6 @@ function exportToJson() {
     showNotification('Data exported to JSON successfully!');
 }
 
-// Export Filtered Data
 function exportFiltered() {
     if (filteredAchievements.length === 0) {
         showNotification('No data to export.', 'error');
@@ -623,7 +654,6 @@ function exportFiltered() {
     showNotification(`Exported ${filteredAchievements.length} filtered entries!`);
 }
 
-// Convert to CSV Helper
 function convertToCSV(data) {
     const headers = ['type', 'title', 'description', 'date', 'grade', 'institution', 'category'];
     const csvRows = [headers.join(',')];
@@ -639,7 +669,6 @@ function convertToCSV(data) {
     return csvRows.join('\n');
 }
 
-// Download File Helper
 function downloadFile(content, filename, contentType) {
     const blob = new Blob([content], { type: contentType });
     const url = URL.createObjectURL(blob);
@@ -652,14 +681,12 @@ function downloadFile(content, filename, contentType) {
     URL.revokeObjectURL(url);
 }
 
-// Download CSV Template
 function downloadCsvTemplate() {
     const template = 'type,title,description,date,grade,institution,category\nachievement,Example Achievement,This is a sample description,2025-01-15,A+,University Name,Computer Science';
     downloadFile(template, 'template.csv', 'text/csv');
     showNotification('CSV template downloaded!');
 }
 
-// Download JSON Template
 function downloadJsonTemplate() {
     const template = [
         {
@@ -677,7 +704,6 @@ function downloadJsonTemplate() {
     showNotification('JSON template downloaded!');
 }
 
-// Create Backup
 function createBackup() {
     if (achievements.length === 0) {
         showNotification('No data to backup.', 'error');
@@ -698,3 +724,7 @@ function createBackup() {
     downloadFile(json, filename, 'application/json');
     showNotification('Backup created successfully!');
 }
+
+// Initialize theme
+const savedTheme = localStorage.getItem('theme') || 'light';
+document.documentElement.setAttribute('data-theme', savedTheme);
