@@ -79,6 +79,10 @@
         .btn-login:hover {
             transform: translateY(-2px);
         }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
         .error-message {
             background: #fee2e2;
             color: #dc2626;
@@ -87,6 +91,15 @@
             margin-bottom: 1rem;
             font-size: 0.875rem;
             display: none;
+        }
+        .info-message {
+            background: #dbeafe;
+            color: #1e40af;
+            padding: 0.5rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.75rem;
+            text-align: center;
         }
         
         /* Dashboard */
@@ -183,11 +196,7 @@
         .btn-danger { background: #ef4444; color: white; }
         .btn-primary { background: #667eea; color: white; }
         .loading { text-align: center; padding: 2rem; color: #6b7280; }
-        .no-data {
-            text-align: center;
-            padding: 2rem;
-            color: #6b7280;
-        }
+        .no-data { text-align: center; padding: 2rem; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -198,18 +207,22 @@
                 <h1>🔐 Admin Login</h1>
                 <p>AcadGenie Admin Panel</p>
             </div>
-            <div class="error-message" id="errorMessage">Invalid credentials!</div>
+            <div class="error-message" id="errorMessage"></div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="adminId">Admin ID</label>
-                    <input type="text" id="adminId" placeholder="Enter admin ID" required>
+                    <label for="adminEmail">Admin Email</label>
+                    <input type="email" id="adminEmail" placeholder="admin@acadgenie.com" value="admin@acadgenie.com" required>
                 </div>
                 <div class="form-group">
                     <label for="adminPassword">Password</label>
-                    <input type="password" id="adminPassword" placeholder="Enter password" required>
+                    <input type="password" id="adminPassword" placeholder="Enter password" value="Admin@123" required>
                 </div>
-                <button type="submit" class="btn-login">Sign In</button>
+                <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
             </form>
+            <div class="info-message">
+                First time? Create admin account in Firebase Console<br>
+                Email: admin@acadgenie.com | Pass: Admin@123
+            </div>
         </div>
     </div>
 
@@ -231,8 +244,8 @@
                     <div class="stat-label">Total Achievements</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="newUsersToday">...</div>
-                    <div class="stat-label">New Users Today</div>
+                    <div class="stat-number" id="avgPerUser">...</div>
+                    <div class="stat-label">Avg per User</div>
                 </div>
             </div>
 
@@ -243,10 +256,9 @@
                 <table id="usersTable" style="display: none;">
                     <thead>
                         <tr>
-                            <th>Email</th>
+                            <th>User ID</th>
                             <th>Achievements</th>
                             <th>Latest Activity</th>
-                            <th>Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -261,7 +273,7 @@
                 <table id="achievementsTable" style="display: none;">
                     <thead>
                         <tr>
-                            <th>User Email</th>
+                            <th>User</th>
                             <th>Title</th>
                             <th>Type</th>
                             <th>Date</th>
@@ -275,6 +287,7 @@
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <script>
@@ -288,29 +301,41 @@
             appId: "1:960534024344:web:c71536afec7e1492e640ed"
         };
         firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // Admin credentials
-        const ADMIN_ID = 'chin1234';
-        const ADMIN_PASSWORD = '0987654321';
-        
-        // Check if already logged in
-        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
-            showDashboard();
-        }
-        
-        // Login form handler
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const adminId = document.getElementById('adminId').value;
-            const password = document.getElementById('adminPassword').value;
-            
-            if (adminId === ADMIN_ID && password === ADMIN_PASSWORD) {
-                sessionStorage.setItem('adminLoggedIn', 'true');
-                document.getElementById('errorMessage').style.display = 'none';
+        // Check if admin is logged in
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                console.log('Admin authenticated:', user.email);
                 showDashboard();
             } else {
-                document.getElementById('errorMessage').style.display = 'block';
+                document.getElementById('loginScreen').style.display = 'flex';
+                document.getElementById('dashboard').style.display = 'none';
+            }
+        });
+        
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('errorMessage');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Signing in...';
+            errorMsg.style.display = 'none';
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                // Dashboard will load automatically via onAuthStateChanged
+            } catch (error) {
+                console.error('Login error:', error);
+                errorMsg.textContent = error.message;
+                errorMsg.style.display = 'block';
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Sign In';
             }
         });
         
@@ -321,10 +346,9 @@
         }
         
         function logout() {
-            sessionStorage.removeItem('adminLoggedIn');
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('dashboard').style.display = 'none';
-            document.getElementById('loginForm').reset();
+            auth.signOut().then(() => {
+                console.log('Admin logged out');
+            });
         }
         
         async function loadDashboard() {
@@ -332,7 +356,6 @@
                 await Promise.all([loadUsers(), loadAchievements()]);
             } catch (error) {
                 console.error('Dashboard load error:', error);
-                alert('Error loading data. Check console for details.');
             }
         }
         
@@ -340,14 +363,12 @@
             try {
                 console.log('Loading users...');
                 
-                // Get all users by querying the root level 'users' collection
                 const usersRef = db.collection('users');
                 const snapshot = await usersRef.get();
                 
-                console.log('Users snapshot size:', snapshot.size);
+                console.log('Users found:', snapshot.size);
                 
                 if (snapshot.empty) {
-                    console.log('No users found in database');
                     document.getElementById('totalUsers').textContent = '0';
                     document.getElementById('usersLoading').style.display = 'none';
                     document.getElementById('usersNoData').style.display = 'block';
@@ -359,7 +380,6 @@
                 for (const userDoc of snapshot.docs) {
                     const userId = userDoc.id;
                     
-                    // Get achievements count for this user
                     const achievementsRef = await db.collection('users')
                         .doc(userId)
                         .collection('achievements')
@@ -367,7 +387,6 @@
                     
                     const achievementCount = achievementsRef.size;
                     
-                    // Get latest achievement date
                     let latestDate = null;
                     if (!achievementsRef.empty) {
                         const sortedAchievements = achievementsRef.docs.sort((a, b) => {
@@ -380,13 +399,10 @@
                     
                     usersData.push({
                         id: userId,
-                        email: userId, // Using UID as email display
                         achievementCount: achievementCount,
                         latestActivity: latestDate
                     });
                 }
-                
-                console.log('Users data:', usersData);
                 
                 document.getElementById('totalUsers').textContent = usersData.length;
                 document.getElementById('usersLoading').style.display = 'none';
@@ -398,10 +414,9 @@
                 usersData.forEach(user => {
                     const row = `
                         <tr>
-                            <td>${user.email}</td>
+                            <td>${user.id.substring(0, 20)}...</td>
                             <td>${user.achievementCount} entries</td>
                             <td>${formatDate(user.latestActivity)}</td>
-                            <td><span class="badge badge-success">Active</span></td>
                             <td>
                                 <button class="btn btn-primary" onclick="viewUserData('${user.id}')">View</button>
                                 <button class="btn btn-danger" onclick="deleteUser('${user.id}')">Delete</button>
@@ -423,12 +438,8 @@
                 let totalCount = 0;
                 const allAchievements = [];
                 
-                // Get all users first
                 const usersSnapshot = await db.collection('users').get();
                 
-                console.log('Found users:', usersSnapshot.size);
-                
-                // For each user, get their achievements
                 for (const userDoc of usersSnapshot.docs) {
                     const userId = userDoc.id;
                     const achievementsSnapshot = await db.collection('users')
@@ -450,9 +461,12 @@
                 }
                 
                 console.log('Total achievements:', totalCount);
-                console.log('Recent achievements:', allAchievements.length);
                 
                 document.getElementById('totalAchievements').textContent = totalCount;
+                
+                const userCount = usersSnapshot.size;
+                const avgPerUser = userCount > 0 ? (totalCount / userCount).toFixed(1) : 0;
+                document.getElementById('avgPerUser').textContent = avgPerUser;
                 
                 if (allAchievements.length === 0) {
                     document.getElementById('achievementsLoading').style.display = 'none';
@@ -460,7 +474,6 @@
                     return;
                 }
                 
-                // Sort by date
                 allAchievements.sort((a, b) => {
                     const dateA = a.createdAt?.toDate() || new Date(0);
                     const dateB = b.createdAt?.toDate() || new Date(0);
@@ -476,7 +489,7 @@
                 allAchievements.slice(0, 20).forEach(achievement => {
                     const row = `
                         <tr>
-                            <td>${achievement.userId}</td>
+                            <td>${achievement.userId.substring(0, 15)}...</td>
                             <td>${achievement.title || 'Untitled'}</td>
                             <td><span class="badge badge-${achievement.type || 'achievement'}">${achievement.type || 'N/A'}</span></td>
                             <td>${achievement.date || 'N/A'}</td>
@@ -485,9 +498,6 @@
                     `;
                     tbody.innerHTML += row;
                 });
-                
-                // Calculate new users today (placeholder)
-                document.getElementById('newUsersToday').textContent = '0';
                 
             } catch (error) {
                 console.error('Error loading achievements:', error);
@@ -513,7 +523,7 @@
             try {
                 const achievements = await db.collection('users').doc(userId).collection('achievements').get();
                 const data = achievements.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('User Data for ' + userId + ':', data);
+                console.log('User Data:', data);
                 alert(`User has ${achievements.size} achievements.\n\nCheck browser console (F12) for full details.`);
             } catch (error) {
                 alert('Error: ' + error.message);
@@ -521,7 +531,7 @@
         }
         
         function deleteUser(userId) {
-            if (confirm('⚠️ Are you sure you want to delete this user and ALL their data?\n\nThis action cannot be undone!')) {
+            if (confirm('⚠️ DELETE USER AND ALL DATA?\n\nThis cannot be undone!')) {
                 db.collection('users').doc(userId).collection('achievements').get()
                     .then(snapshot => {
                         const batch = db.batch();
@@ -529,13 +539,12 @@
                         return batch.commit();
                     })
                     .then(() => {
-                        alert('✅ User and all achievements deleted successfully!');
+                        alert('✅ User deleted!');
                         loadUsers();
                         loadAchievements();
                     })
                     .catch(error => {
-                        console.error('Delete error:', error);
-                        alert('Error deleting user: ' + error.message);
+                        alert('Error: ' + error.message);
                     });
             }
         }
