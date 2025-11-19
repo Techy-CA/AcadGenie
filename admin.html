@@ -8,11 +8,114 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f3f4f6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
             padding: 2rem;
         }
+        .login-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .login-header h1 {
+            font-size: 1.75rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+        .login-header p {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #374151;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 0.875rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+        }
+        .error-message {
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+        
+        /* Dashboard */
+        .dashboard {
+            display: none;
+            padding: 2rem;
+            background: #f3f4f6;
+            min-height: 100vh;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .dashboard-header h1 {
+            color: #1f2937;
+            font-size: 2rem;
+        }
+        .btn-logout {
+            padding: 0.625rem 1.25rem;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
         .container { max-width: 1400px; margin: 0 auto; }
-        h1 { margin-bottom: 2rem; color: #1f2937; }
         .stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -25,7 +128,7 @@
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .stat-number { font-size: 2.5rem; font-weight: 700; color: #3b82f6; }
+        .stat-number { font-size: 2.5rem; font-weight: 700; color: #667eea; }
         .stat-label { color: #6b7280; margin-top: 0.5rem; }
         .section {
             background: white;
@@ -33,6 +136,10 @@
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 1.5rem;
+        }
+        .section h2 {
+            margin-bottom: 1rem;
+            color: #1f2937;
         }
         table {
             width: 100%;
@@ -47,6 +154,7 @@
             background: #f9fafb;
             font-weight: 600;
             color: #374151;
+            font-size: 0.875rem;
         }
         .badge {
             display: inline-block;
@@ -56,7 +164,9 @@
             font-weight: 600;
         }
         .badge-success { background: #d1fae5; color: #065f46; }
-        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-achievement { background: #dbeafe; color: #1e40af; }
+        .badge-result { background: #d1fae5; color: #065f46; }
+        .badge-record { background: #fef3c7; color: #92400e; }
         .btn {
             padding: 0.5rem 1rem;
             border: none;
@@ -64,69 +174,97 @@
             cursor: pointer;
             font-size: 0.875rem;
             font-weight: 500;
+            margin-right: 0.5rem;
         }
         .btn-danger { background: #ef4444; color: white; }
-        .btn-primary { background: #3b82f6; color: white; }
+        .btn-primary { background: #667eea; color: white; }
         .loading { text-align: center; padding: 2rem; color: #6b7280; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎓 AcadGenie Admin Panel</h1>
-        
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalUsers">0</div>
-                <div class="stat-label">Total Users</div>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-header">
+                <h1>🔐 Admin Login</h1>
+                <p>AcadGenie Admin Panel</p>
             </div>
-            <div class="stat-card">
-                <div class="stat-number" id="totalAchievements">0</div>
-                <div class="stat-label">Total Achievements</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="activeToday">0</div>
-                <div class="stat-label">Active Today</div>
-            </div>
+            <div class="error-message" id="errorMessage">Invalid credentials!</div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="adminId">Admin ID</label>
+                    <input type="text" id="adminId" placeholder="Enter admin ID" required>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <input type="password" id="adminPassword" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
         </div>
+    </div>
 
-        <div class="section">
-            <h2 style="margin-bottom: 1rem;">All Users</h2>
-            <div id="usersLoading" class="loading">Loading users...</div>
-            <table id="usersTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>Email</th>
-                        <th>Display Name</th>
-                        <th>Created</th>
-                        <th>Last Login</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="usersBody"></tbody>
-            </table>
-        </div>
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>🎓 AcadGenie Admin Panel</h1>
+                <button class="btn-logout" onclick="logout()">Logout</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalUsers">0</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="totalAchievements">0</div>
+                    <div class="stat-label">Total Achievements</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="newUsersToday">0</div>
+                    <div class="stat-label">New Users Today</div>
+                </div>
+            </div>
 
-        <div class="section">
-            <h2 style="margin-bottom: 1rem;">Recent Achievements</h2>
-            <div id="achievementsLoading" class="loading">Loading achievements...</div>
-            <table id="achievementsTable" style="display: none;">
-                <thead>
-                    <tr>
-                        <th>User</th>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Date</th>
-                        <th>Grade</th>
-                    </tr>
-                </thead>
-                <tbody id="achievementsBody"></tbody>
-            </table>
+            <div class="section">
+                <h2>All Users</h2>
+                <div id="usersLoading" class="loading">Loading users...</div>
+                <table id="usersTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>Email</th>
+                            <th>Display Name</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Recent Achievements</h2>
+                <div id="achievementsLoading" class="loading">Loading achievements...</div>
+                <table id="achievementsTable" style="display: none;">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Grade</th>
+                            <th>Institution</th>
+                        </tr>
+                    </thead>
+                    <tbody id="achievementsBody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <script>
@@ -140,25 +278,44 @@
             appId: "1:960534024344:web:c71536afec7e1492e640ed"
         };
         firebase.initializeApp(firebaseConfig);
-        
-        const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // Check if admin is logged in
-        auth.onAuthStateChanged((user) => {
-            if (!user) {
-                // Redirect to login or show login form
-                const email = prompt('Admin Email:');
-                const password = prompt('Admin Password:');
-                if (email && password) {
-                    auth.signInWithEmailAndPassword(email, password)
-                        .then(() => loadDashboard())
-                        .catch(() => alert('Invalid credentials'));
-                }
+        // Admin credentials
+        const ADMIN_ID = 'chin1234';
+        const ADMIN_PASSWORD = '0987654321';
+        
+        // Check if already logged in
+        if (sessionStorage.getItem('adminLoggedIn') === 'true') {
+            showDashboard();
+        }
+        
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const adminId = document.getElementById('adminId').value;
+            const password = document.getElementById('adminPassword').value;
+            
+            if (adminId === ADMIN_ID && password === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminLoggedIn', 'true');
+                document.getElementById('errorMessage').style.display = 'none';
+                showDashboard();
             } else {
-                loadDashboard();
+                document.getElementById('errorMessage').style.display = 'block';
             }
         });
+        
+        function showDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            loadDashboard();
+        }
+        
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginForm').reset();
+        }
         
         async function loadDashboard() {
             loadUsers();
@@ -167,15 +324,30 @@
         
         async function loadUsers() {
             try {
-                // Get all users from Firestore
-                const usersSnapshot = await db.collection('users').get();
-                const users = [];
-                
+                const usersSnapshot = await db.collectionGroup('achievements').get();
+                const userIds = new Set();
                 usersSnapshot.forEach(doc => {
-                    users.push({ id: doc.id, ...doc.data() });
+                    const path = doc.ref.path.split('/');
+                    if (path[0] === 'users') userIds.add(path[1]);
                 });
                 
-                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('totalUsers').textContent = userIds.size;
+                
+                // Load user details
+                const users = [];
+                for (const userId of userIds) {
+                    const userAchievements = await db.collection('users').doc(userId).collection('achievements').get();
+                    if (userAchievements.docs.length > 0) {
+                        const firstDoc = userAchievements.docs[0];
+                        users.push({
+                            id: userId,
+                            email: userId,
+                            achievementCount: userAchievements.size,
+                            createdAt: firstDoc.data().createdAt
+                        });
+                    }
+                }
+                
                 document.getElementById('usersLoading').style.display = 'none';
                 document.getElementById('usersTable').style.display = 'table';
                 
@@ -185,13 +357,12 @@
                 users.forEach(user => {
                     const row = `
                         <tr>
-                            <td>${user.email || 'N/A'}</td>
-                            <td>${user.name || user.displayName || 'N/A'}</td>
+                            <td>${user.email}</td>
+                            <td>${user.achievementCount} achievements</td>
                             <td>${formatDate(user.createdAt)}</td>
-                            <td>${formatDate(user.lastActive)}</td>
                             <td><span class="badge badge-success">Active</span></td>
                             <td>
-                                <button class="btn btn-primary" onclick="viewUser('${user.id}')">View</button>
+                                <button class="btn btn-primary" onclick="viewUserData('${user.id}')">View Data</button>
                                 <button class="btn btn-danger" onclick="deleteUser('${user.id}')">Delete</button>
                             </td>
                         </tr>
@@ -208,27 +379,20 @@
                 let totalAchievements = 0;
                 const recentAchievements = [];
                 
-                // Get all users
-                const usersSnapshot = await db.collection('users').get();
+                const achievementsSnapshot = await db.collectionGroup('achievements')
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .get();
                 
-                for (const userDoc of usersSnapshot.docs) {
-                    const achievementsSnapshot = await db.collection('users')
-                        .doc(userDoc.id)
-                        .collection('achievements')
-                        .orderBy('createdAt', 'desc')
-                        .limit(10)
-                        .get();
-                    
-                    totalAchievements += achievementsSnapshot.size;
-                    
-                    achievementsSnapshot.forEach(doc => {
-                        recentAchievements.push({
-                            userId: userDoc.id,
-                            userEmail: userDoc.data().email,
-                            ...doc.data()
-                        });
+                totalAchievements = achievementsSnapshot.size;
+                
+                achievementsSnapshot.forEach(doc => {
+                    const path = doc.ref.path.split('/');
+                    recentAchievements.push({
+                        userId: path[1],
+                        ...doc.data()
                     });
-                }
+                });
                 
                 document.getElementById('totalAchievements').textContent = totalAchievements;
                 document.getElementById('achievementsLoading').style.display = 'none';
@@ -240,11 +404,12 @@
                 recentAchievements.slice(0, 20).forEach(achievement => {
                     const row = `
                         <tr>
-                            <td>${achievement.userEmail}</td>
+                            <td>${achievement.userId}</td>
                             <td>${achievement.title}</td>
                             <td><span class="badge badge-${achievement.type}">${achievement.type}</span></td>
                             <td>${achievement.date}</td>
                             <td>${achievement.grade || '-'}</td>
+                            <td>${achievement.institution || '-'}</td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
@@ -257,20 +422,34 @@
         function formatDate(timestamp) {
             if (!timestamp) return 'N/A';
             const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-            return date.toLocaleDateString();
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
         }
         
-        function viewUser(userId) {
-            window.open(`/?user=${userId}`, '_blank');
+        async function viewUserData(userId) {
+            const achievements = await db.collection('users').doc(userId).collection('achievements').get();
+            const data = achievements.docs.map(doc => doc.data());
+            console.log('User Data:', data);
+            alert(`User has ${achievements.size} achievements. Check console for details.`);
         }
         
         function deleteUser(userId) {
-            if (confirm('Are you sure you want to delete this user?')) {
-                db.collection('users').doc(userId).delete()
+            if (confirm('⚠️ Are you sure you want to delete this user and all their data?')) {
+                db.collection('users').doc(userId).collection('achievements').get()
+                    .then(snapshot => {
+                        const batch = db.batch();
+                        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        return batch.commit();
+                    })
                     .then(() => {
-                        alert('User deleted');
+                        alert('✅ User deleted successfully!');
                         loadUsers();
-                    });
+                        loadAchievements();
+                    })
+                    .catch(error => alert('Error: ' + error.message));
             }
         }
     </script>
