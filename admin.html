@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AcadGenie Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f3f4f6;
+            padding: 2rem;
+        }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { margin-bottom: 2rem; color: #1f2937; }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-number { font-size: 2.5rem; font-weight: 700; color: #3b82f6; }
+        .stat-label { color: #6b7280; margin-top: 0.5rem; }
+        .section {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+            color: #374151;
+        }
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+        .btn-danger { background: #ef4444; color: white; }
+        .btn-primary { background: #3b82f6; color: white; }
+        .loading { text-align: center; padding: 2rem; color: #6b7280; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 AcadGenie Admin Panel</h1>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalAchievements">0</div>
+                <div class="stat-label">Total Achievements</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="activeToday">0</div>
+                <div class="stat-label">Active Today</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2 style="margin-bottom: 1rem;">All Users</h2>
+            <div id="usersLoading" class="loading">Loading users...</div>
+            <table id="usersTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Display Name</th>
+                        <th>Created</th>
+                        <th>Last Login</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersBody"></tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2 style="margin-bottom: 1rem;">Recent Achievements</h2>
+            <div id="achievementsLoading" class="loading">Loading achievements...</div>
+            <table id="achievementsTable" style="display: none;">
+                <thead>
+                    <tr>
+                        <th>User</th>
+                        <th>Title</th>
+                        <th>Type</th>
+                        <th>Date</th>
+                        <th>Grade</th>
+                    </tr>
+                </thead>
+                <tbody id="achievementsBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyACDVh6WgW_frUT69i5cxCH6Gsjc2DhL8U",
+            authDomain: "acadgenie-aa1f0.firebaseapp.com",
+            projectId: "acadgenie-aa1f0",
+            storageBucket: "acadgenie-aa1f0.firebasestorage.app",
+            messagingSenderId: "960534024344",
+            appId: "1:960534024344:web:c71536afec7e1492e640ed"
+        };
+        firebase.initializeApp(firebaseConfig);
+        
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Check if admin is logged in
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Redirect to login or show login form
+                const email = prompt('Admin Email:');
+                const password = prompt('Admin Password:');
+                if (email && password) {
+                    auth.signInWithEmailAndPassword(email, password)
+                        .then(() => loadDashboard())
+                        .catch(() => alert('Invalid credentials'));
+                }
+            } else {
+                loadDashboard();
+            }
+        });
+        
+        async function loadDashboard() {
+            loadUsers();
+            loadAchievements();
+        }
+        
+        async function loadUsers() {
+            try {
+                // Get all users from Firestore
+                const usersSnapshot = await db.collection('users').get();
+                const users = [];
+                
+                usersSnapshot.forEach(doc => {
+                    users.push({ id: doc.id, ...doc.data() });
+                });
+                
+                document.getElementById('totalUsers').textContent = users.length;
+                document.getElementById('usersLoading').style.display = 'none';
+                document.getElementById('usersTable').style.display = 'table';
+                
+                const tbody = document.getElementById('usersBody');
+                tbody.innerHTML = '';
+                
+                users.forEach(user => {
+                    const row = `
+                        <tr>
+                            <td>${user.email || 'N/A'}</td>
+                            <td>${user.name || user.displayName || 'N/A'}</td>
+                            <td>${formatDate(user.createdAt)}</td>
+                            <td>${formatDate(user.lastActive)}</td>
+                            <td><span class="badge badge-success">Active</span></td>
+                            <td>
+                                <button class="btn btn-primary" onclick="viewUser('${user.id}')">View</button>
+                                <button class="btn btn-danger" onclick="deleteUser('${user.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+        
+        async function loadAchievements() {
+            try {
+                let totalAchievements = 0;
+                const recentAchievements = [];
+                
+                // Get all users
+                const usersSnapshot = await db.collection('users').get();
+                
+                for (const userDoc of usersSnapshot.docs) {
+                    const achievementsSnapshot = await db.collection('users')
+                        .doc(userDoc.id)
+                        .collection('achievements')
+                        .orderBy('createdAt', 'desc')
+                        .limit(10)
+                        .get();
+                    
+                    totalAchievements += achievementsSnapshot.size;
+                    
+                    achievementsSnapshot.forEach(doc => {
+                        recentAchievements.push({
+                            userId: userDoc.id,
+                            userEmail: userDoc.data().email,
+                            ...doc.data()
+                        });
+                    });
+                }
+                
+                document.getElementById('totalAchievements').textContent = totalAchievements;
+                document.getElementById('achievementsLoading').style.display = 'none';
+                document.getElementById('achievementsTable').style.display = 'table';
+                
+                const tbody = document.getElementById('achievementsBody');
+                tbody.innerHTML = '';
+                
+                recentAchievements.slice(0, 20).forEach(achievement => {
+                    const row = `
+                        <tr>
+                            <td>${achievement.userEmail}</td>
+                            <td>${achievement.title}</td>
+                            <td><span class="badge badge-${achievement.type}">${achievement.type}</span></td>
+                            <td>${achievement.date}</td>
+                            <td>${achievement.grade || '-'}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error('Error loading achievements:', error);
+            }
+        }
+        
+        function formatDate(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleDateString();
+        }
+        
+        function viewUser(userId) {
+            window.open(`/?user=${userId}`, '_blank');
+        }
+        
+        function deleteUser(userId) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                db.collection('users').doc(userId).delete()
+                    .then(() => {
+                        alert('User deleted');
+                        loadUsers();
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
