@@ -11,98 +11,25 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
-        
-        .login-screen {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 2rem;
-        }
-        .login-container {
-            background: white;
-            padding: 3rem;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 100%;
-            max-width: 400px;
-        }
+        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+        .login-container { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
         .login-header { text-align: center; margin-bottom: 2rem; }
         .login-header h1 { font-size: 1.75rem; color: #1f2937; margin-bottom: 0.5rem; }
         .login-header p { color: #6b7280; font-size: 0.875rem; }
         .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; font-size: 0.875rem; }
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-        .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
-        .btn-login {
-            width: 100%;
-            padding: 0.875rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-        .btn-login:hover { transform: translateY(-2px); }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
+        .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        .btn-login { width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
         .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 0.75rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-size: 0.875rem;
-            display: none;
-        }
-        
+        .error-message { background: #fee2e2; color: #dc2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; display: none; }
         .dashboard { display: none; padding: 2rem; background: #f3f4f6; min-height: 100vh; }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .dashboard-header h1 { color: #1f2937; font-size: 1.75rem; }
-        .btn-logout {
-            padding: 0.625rem 1.25rem;
-            background: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-        .btn-refresh {
-            padding: 0.625rem 1.25rem;
-            background: #10b981;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+        .btn-logout { padding: 0.625rem 1.25rem; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 0.5rem; }
+        .btn-refresh { padding: 0.625rem 1.25rem; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .container { max-width: 1400px; margin: 0 auto; }
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
+        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .stat-number { font-size: 2.5rem; font-weight: 700; color: #667eea; }
         .stat-label { color: #6b7280; margin-top: 0.5rem; }
@@ -111,51 +38,15 @@
         table { width: 100%; border-collapse: collapse; }
         th, td { text-align: left; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
         th { background: #f9fafb; font-weight: 600; color: #374151; font-size: 0.875rem; }
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
         .badge-achievement { background: #dbeafe; color: #1e40af; }
         .badge-result { background: #d1fae5; color: #065f46; }
         .badge-record { background: #fef3c7; color: #92400e; }
-        .btn {
-            padding: 0.5rem 1rem;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 0.875rem;
-            font-weight: 500;
-            margin-right: 0.5rem;
-        }
+        .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; margin-right: 0.5rem; }
         .btn-danger { background: #ef4444; color: white; }
         .btn-primary { background: #667eea; color: white; }
         .loading { text-align: center; padding: 2rem; color: #6b7280; }
-        .no-data { text-align: center; padding: 2rem; color: #6b7280; }
-        .username { 
-            font-weight: 700; 
-            color: #667eea; 
-            font-size: 1.1rem;
-        }
-        .user-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 0.375rem 0.75rem;
-            border-radius: 6px;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .success-box {
-            background: #d1fae5;
-            color: #065f46;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
+        .username { font-weight: 700; color: #667eea; font-size: 1.05rem; }
     </style>
 </head>
 <body>
@@ -168,12 +59,12 @@
             <div class="error-message" id="errorMessage"></div>
             <form id="loginForm">
                 <div class="form-group">
-                    <label for="adminEmail">Admin Email</label>
-                    <input type="email" id="adminEmail" placeholder="admin@acadgenie.com" value="admin@acadgenie.com" required>
+                    <label>Admin Email</label>
+                    <input type="email" id="adminEmail" value="admin@acadgenie.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="adminPassword">Password</label>
-                    <input type="password" id="adminPassword" placeholder="Enter password" value="Admin@123" required>
+                    <label>Password</label>
+                    <input type="password" id="adminPassword" value="Admin@123" required>
                 </div>
                 <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
             </form>
@@ -183,15 +74,11 @@
     <div class="dashboard" id="dashboard">
         <div class="container">
             <div class="dashboard-header">
-                <h1>🎓 AcadGenie Admin Panel</h1>
+                <h1>🎓 AcadGenie Admin</h1>
                 <div>
-                    <button class="btn-refresh" onclick="forceRefresh()">🔄 Refresh</button>
-                    <button class="btn-logout" onclick="logout()">Logout</button>
+                    <button class="btn-refresh" onclick="loadData()">🔄 Refresh</button>
+                    <button class="btn-logout" onclick="auth.signOut()">Logout</button>
                 </div>
-            </div>
-            
-            <div class="success-box" id="successBox" style="display: none;">
-                ✅ Loaded data successfully!
             </div>
             
             <div class="stats">
@@ -210,43 +97,37 @@
             </div>
 
             <div class="section">
-                <h2>All Users by Username</h2>
-                <div id="usersLoading" class="loading">Loading all users...</div>
-                <div id="usersNoData" class="no-data" style="display: none;">No users found</div>
-                <div style="overflow-x: auto;">
-                    <table id="usersTable" style="display: none;">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Username</th>
-                                <th>Achievements</th>
-                                <th>Latest Activity</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersBody"></tbody>
-                    </table>
-                </div>
+                <h2>All Users</h2>
+                <div id="usersLoading" class="loading">Loading...</div>
+                <table id="usersTable" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Username</th>
+                            <th>Achievements</th>
+                            <th>Latest</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersBody"></tbody>
+                </table>
             </div>
 
             <div class="section">
                 <h2>Recent Achievements</h2>
-                <div id="achievementsLoading" class="loading">Loading achievements...</div>
-                <div id="achievementsNoData" class="no-data" style="display: none;">No achievements found</div>
-                <div style="overflow-x: auto;">
-                    <table id="achievementsTable" style="display: none;">
-                        <thead>
-                            <tr>
-                                <th>Username</th>
-                                <th>Title</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                                <th>Grade</th>
-                            </tr>
-                        </thead>
-                        <tbody id="achievementsBody"></tbody>
-                    </table>
-                </div>
+                <div id="achievementsLoading" class="loading">Loading...</div>
+                <table id="achievementsTable" style="display:none;">
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Title</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Grade</th>
+                        </tr>
+                    </thead>
+                    <tbody id="achievementsBody"></tbody>
+                </table>
             </div>
         </div>
     </div>
@@ -268,10 +149,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(user => {
             if (user) {
-                console.log('✅ Admin logged in');
-                showDashboard();
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                loadData();
             } else {
                 document.getElementById('loginScreen').style.display = 'flex';
                 document.getElementById('dashboard').style.display = 'none';
@@ -282,93 +164,64 @@
             e.preventDefault();
             const email = document.getElementById('adminEmail').value;
             const password = document.getElementById('adminPassword').value;
-            const loginBtn = document.getElementById('loginBtn');
-            const errorMsg = document.getElementById('errorMessage');
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('errorMessage');
             
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Signing in...';
-            errorMsg.style.display = 'none';
+            btn.disabled = true;
+            btn.textContent = 'Signing in...';
+            err.style.display = 'none';
             
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
-                errorMsg.textContent = error.message;
-                errorMsg.style.display = 'block';
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Sign In';
+                err.textContent = error.message;
+                err.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Sign In';
             }
         });
         
-        function showDashboard() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            loadAllData();
-        }
-        
-        function logout() { auth.signOut(); }
-        function forceRefresh() { loadAllData(); }
-        
-        async function loadAllData() {
+        async function loadData() {
             try {
-                console.log('🔍 Scanning for all users (by USERNAME)...');
+                console.log('Loading all users via collectionGroup...');
                 
-                // Use collectionGroup to get ALL achievements
                 const allAchievements = await db.collectionGroup('achievements').get();
                 
-                console.log('📊 Total achievements found:', allAchievements.size);
+                console.log('Found achievements:', allAchievements.size);
                 
                 if (allAchievements.empty) {
                     document.getElementById('totalUsers').textContent = '0';
                     document.getElementById('totalAchievements').textContent = '0';
                     document.getElementById('avgPerUser').textContent = '0';
-                    document.getElementById('usersLoading').style.display = 'none';
-                    document.getElementById('usersNoData').style.display = 'block';
-                    document.getElementById('achievementsLoading').style.display = 'none';
-                    document.getElementById('achievementsNoData').style.display = 'block';
+                    document.getElementById('usersLoading').textContent = 'No data found';
+                    document.getElementById('achievementsLoading').textContent = 'No data found';
                     return;
                 }
                 
-                // Extract usernames from paths
                 const userMap = new Map();
                 
                 allAchievements.forEach(doc => {
-                    const path = doc.ref.path; 
-                    // Path format: "users/USERNAME/achievements/DOC_ID"
-                    const parts = path.split('/');
-                    const username = parts[1]; // Extract USERNAME
-                    
-                    console.log('👤 Found user:', username);
+                    const path = doc.ref.path;
+                    const username = path.split('/')[1];
                     
                     if (!userMap.has(username)) {
-                        userMap.set(username, {
-                            username: username,
-                            achievements: [],
-                            count: 0
-                        });
+                        userMap.set(username, { username, achievements: [], count: 0 });
                     }
                     
-                    const data = doc.data();
-                    userMap.get(username).achievements.push(data);
+                    userMap.get(username).achievements.push(doc.data());
                     userMap.get(username).count++;
                 });
                 
-                console.log('✅ Total unique users:', userMap.size);
-                console.log('📋 Usernames:', Array.from(userMap.keys()));
+                console.log('Total users:', userMap.size);
+                console.log('Usernames:', Array.from(userMap.keys()));
                 
-                // Show success message
-                document.getElementById('successBox').style.display = 'block';
-                document.getElementById('successBox').textContent = 
-                    `✅ Found ${userMap.size} users with ${allAchievements.size} achievements`;
-                
-                // Update stats
                 document.getElementById('totalUsers').textContent = userMap.size;
                 document.getElementById('totalAchievements').textContent = allAchievements.size;
                 document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
                 
-                // Build users table
+                // Users table
                 const usersData = [];
                 for (const [username, data] of userMap) {
-                    // Get latest activity
                     const sorted = data.achievements.sort((a, b) => {
                         const dateA = a.createdAt?.toDate() || new Date(0);
                         const dateB = b.createdAt?.toDate() || new Date(0);
@@ -376,57 +229,47 @@
                     });
                     
                     usersData.push({
-                        username: username,
+                        username,
                         count: data.count,
-                        latestActivity: sorted[0].createdAt || null
+                        latest: sorted[0].createdAt
                     });
                 }
                 
-                // Sort by latest activity
                 usersData.sort((a, b) => {
-                    const dateA = a.latestActivity?.toDate() || new Date(0);
-                    const dateB = b.latestActivity?.toDate() || new Date(0);
+                    const dateA = a.latest?.toDate() || new Date(0);
+                    const dateB = b.latest?.toDate() || new Date(0);
                     return dateB - dateA;
                 });
                 
-                // Render users table
                 document.getElementById('usersLoading').style.display = 'none';
                 document.getElementById('usersTable').style.display = 'table';
                 
                 const tbody = document.getElementById('usersBody');
                 tbody.innerHTML = '';
                 
-                usersData.forEach((user, index) => {
-                    const row = `
+                usersData.forEach((user, i) => {
+                    tbody.innerHTML += `
                         <tr>
-                            <td>${index + 1}</td>
-                            <td>
-                                <span class="user-badge">@${user.username}</span>
-                            </td>
+                            <td>${i + 1}</td>
+                            <td><span class="username">@${user.username}</span></td>
                             <td><strong>${user.count}</strong> entries</td>
-                            <td>${formatDate(user.latestActivity)}</td>
+                            <td>${formatDate(user.latest)}</td>
                             <td>
-                                <button class="btn btn-primary" onclick="viewUserData('${user.username}')">View</button>
+                                <button class="btn btn-primary" onclick="viewUser('${user.username}')">View</button>
                                 <button class="btn btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
                             </td>
                         </tr>
                     `;
-                    tbody.innerHTML += row;
                 });
                 
-                // Render achievements table
-                const recentAchievements = [];
+                // Achievements table
+                const recent = [];
                 allAchievements.forEach(doc => {
-                    const path = doc.ref.path;
-                    const username = path.split('/')[1];
-                    
-                    recentAchievements.push({
-                        username: username,
-                        ...doc.data()
-                    });
+                    const username = doc.ref.path.split('/')[1];
+                    recent.push({ username, ...doc.data() });
                 });
                 
-                recentAchievements.sort((a, b) => {
+                recent.sort((a, b) => {
                     const dateA = a.createdAt?.toDate() || new Date(0);
                     const dateB = b.createdAt?.toDate() || new Date(0);
                     return dateB - dateA;
@@ -438,77 +281,54 @@
                 const aTbody = document.getElementById('achievementsBody');
                 aTbody.innerHTML = '';
                 
-                recentAchievements.slice(0, 30).forEach(achievement => {
-                    const row = `
+                recent.slice(0, 20).forEach(a => {
+                    aTbody.innerHTML += `
                         <tr>
-                            <td><span class="username">@${achievement.username}</span></td>
-                            <td>${achievement.title || 'Untitled'}</td>
-                            <td><span class="badge badge-${achievement.type || 'achievement'}">${achievement.type || 'N/A'}</span></td>
-                            <td>${achievement.date || 'N/A'}</td>
-                            <td>${achievement.grade || '-'}</td>
+                            <td><span class="username">@${a.username}</span></td>
+                            <td>${a.title || 'Untitled'}</td>
+                            <td><span class="badge badge-${a.type || 'achievement'}">${a.type || 'N/A'}</span></td>
+                            <td>${a.date || 'N/A'}</td>
+                            <td>${a.grade || '-'}</td>
                         </tr>
                     `;
-                    aTbody.innerHTML += row;
                 });
                 
-                console.log('✅ Dashboard loaded successfully!');
-                
             } catch (error) {
-                console.error('❌ ERROR:', error);
-                alert('Error loading data: ' + error.message + '\n\nCheck console (F12) for details');
+                console.error('ERROR:', error);
+                alert('Error: ' + error.message + '\n\nMake sure Firestore rules are updated!');
             }
         }
         
         function formatDate(timestamp) {
             if (!timestamp) return 'Never';
             try {
-                const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                const now = new Date();
-                const diff = now - date;
-                const hours = Math.floor(diff / 3600000);
-                const days = Math.floor(diff / 86400000);
-                
-                if (hours < 1) return 'Just now';
-                if (hours < 24) return `${hours}h ago`;
-                if (days < 7) return `${days}d ago`;
-                
-                return date.toLocaleDateString('en-IN', { 
-                    month: 'short', 
-                    day: 'numeric',
-                    year: 'numeric'
-                });
-            } catch (error) {
+                const date = timestamp.toDate();
+                return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+            } catch {
                 return 'N/A';
             }
         }
         
-        async function viewUserData(username) {
-            try {
-                const achievements = await db.collection('users').doc(username).collection('achievements').get();
-                const data = achievements.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('👤 User: @' + username);
-                console.table(data);
-                alert(`Username: @${username}\n\nTotal: ${achievements.size} achievements\n\nCheck console (F12) for full data`);
-            } catch (error) {
-                alert('Error: ' + error.message);
-            }
+        async function viewUser(username) {
+            const docs = await db.collection('users').doc(username).collection('achievements').get();
+            const data = docs.docs.map(d => d.data());
+            console.log('User:', username, data);
+            alert(`@${username}\n${docs.size} achievements\n\nCheck console (F12)`);
         }
         
         function deleteUser(username) {
-            if (confirm(`⚠️ DELETE USER?\n\nUsername: @${username}\n\nThis will delete ALL their data!\n\nContinue?`)) {
+            if (confirm(`Delete @${username}?`)) {
                 db.collection('users').doc(username).collection('achievements').get()
-                    .then(snapshot => {
+                    .then(snap => {
                         const batch = db.batch();
-                        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        snap.docs.forEach(doc => batch.delete(doc.ref));
                         return batch.commit();
                     })
                     .then(() => {
-                        alert('✅ User @' + username + ' deleted!');
-                        loadAllData();
+                        alert('Deleted!');
+                        loadData();
                     })
-                    .catch(error => {
-                        alert('Error: ' + error.message);
-                    });
+                    .catch(e => alert('Error: ' + e.message));
             }
         }
     </script>
