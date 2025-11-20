@@ -32,7 +32,6 @@
             color: var(--gray-900);
         }
 
-        /* Login Screen */
         .login-screen {
             display: flex;
             align-items: center;
@@ -122,7 +121,6 @@
             display: none;
         }
 
-        /* Dashboard */
         .dashboard {
             display: none;
             min-height: 100vh;
@@ -417,7 +415,6 @@
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
             <div class="logo-header">
@@ -439,14 +436,13 @@
         </div>
     </div>
 
-    <!-- Dashboard -->
     <div class="dashboard" id="dashboard">
         <header class="header">
             <div class="header-content">
                 <h1>AcadGenie Admin</h1>
                 <div class="header-actions">
                     <button class="btn btn-refresh" onclick="loadData()">🔄 Refresh</button>
-                    <button class="btn btn-logout" onclick="auth.signOut()">Logout</button>
+                    <button class="btn btn-logout" onclick="logout()">Logout</button>
                 </div>
             </div>
         </header>
@@ -546,6 +542,7 @@
         
         auth.onAuthStateChanged(user => {
             if (user) {
+                console.log('✅ Admin logged in');
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 loadData();
@@ -569,6 +566,7 @@
             try {
                 await auth.signInWithEmailAndPassword(email, password);
             } catch (error) {
+                console.error('Login error:', error);
                 err.textContent = error.message;
                 err.style.display = 'block';
                 btn.disabled = false;
@@ -576,171 +574,198 @@
             }
         });
         
-       async function loadData() {
-    try {
-        console.log('Loading all data...');
-        
-        const allAchievements = await db.collectionGroup('achievements').get();
-        
-        if (allAchievements.empty) {
-            document.getElementById('totalUsers').textContent = '0';
-            document.getElementById('totalAchievements').textContent = '0';
-            document.getElementById('avgPerUser').textContent = '0';
-            document.getElementById('usersLoading').style.display = 'none';
-            document.getElementById('usersEmpty').style.display = 'block';
-            document.getElementById('achievementsLoading').style.display = 'none';
-            document.getElementById('achievementsEmpty').style.display = 'block';
-            return;
+        function logout() {
+            auth.signOut();
         }
         
-        const userMap = new Map();
-        
-        // Collect all user data
-        allAchievements.forEach(doc => {
-            const path = doc.ref.path;
-            const username = path.split('/')[1]; // This IS the username!
-            
-            console.log('Found username:', username);
-            
-            if (!userMap.has(username)) {
-                userMap.set(username, {
-                    username: username,
-                    displayName: username, // Username as display name
-                    achievements: [],
-                    count: 0
+        async function loadData() {
+            try {
+                console.log('🔄 Loading all data...');
+                
+                const allAchievements = await db.collectionGroup('achievements').get();
+                
+                console.log('📊 Found achievements:', allAchievements.size);
+                
+                if (allAchievements.empty) {
+                    document.getElementById('totalUsers').textContent = '0';
+                    document.getElementById('totalAchievements').textContent = '0';
+                    document.getElementById('avgPerUser').textContent = '0';
+                    document.getElementById('usersLoading').style.display = 'none';
+                    document.getElementById('usersEmpty').style.display = 'block';
+                    document.getElementById('achievementsLoading').style.display = 'none';
+                    document.getElementById('achievementsEmpty').style.display = 'block';
+                    return;
+                }
+                
+                const userMap = new Map();
+                
+                allAchievements.forEach(doc => {
+                    const path = doc.ref.path;
+                    const username = path.split('/')[1];
+                    
+                    console.log('👤 Found username:', username);
+                    
+                    if (!userMap.has(username)) {
+                        userMap.set(username, {
+                            username: username,
+                            displayName: username,
+                            achievements: [],
+                            count: 0
+                        });
+                    }
+                    
+                    userMap.get(username).achievements.push(doc.data());
+                    userMap.get(username).count++;
                 });
+                
+                console.log('✅ Total users:', userMap.size);
+                console.log('📋 All usernames:', Array.from(userMap.keys()));
+                
+                document.getElementById('totalUsers').textContent = userMap.size;
+                document.getElementById('totalAchievements').textContent = allAchievements.size;
+                document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
+                
+                const usersData = Array.from(userMap.values());
+                
+                usersData.sort((a, b) => {
+                    const dateA = a.achievements[0]?.createdAt?.toDate() || new Date(0);
+                    const dateB = b.achievements[0]?.createdAt?.toDate() || new Date(0);
+                    return dateB - dateA;
+                });
+                
+                document.getElementById('usersLoading').style.display = 'none';
+                document.getElementById('usersTable').style.display = 'table';
+                
+                const tbody = document.getElementById('usersBody');
+                tbody.innerHTML = '';
+                
+                usersData.forEach((user) => {
+                    const latest = user.achievements.sort((a, b) => {
+                        const dateA = a.createdAt?.toDate() || new Date(0);
+                        const dateB = b.createdAt?.toDate() || new Date(0);
+                        return dateB - dateA;
+                    })[0];
+                    
+                    const initials = user.username.substring(0, 2).toUpperCase();
+                    
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">${initials}</div>
+                                    <div class="user-details">
+                                        <div class="user-name">${user.displayName}</div>
+                                        <div class="user-username">@${user.username}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><strong>${user.count}</strong> entries</td>
+                            <td>${formatDate(latest?.createdAt)}</td>
+                            <td>
+                                <button class="btn-sm btn-primary" onclick="viewUser('${user.username}')">View</button>
+                                <button class="btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                const recent = [];
+                allAchievements.forEach(doc => {
+                    const username = doc.ref.path.split('/')[1];
+                    const user = userMap.get(username);
+                    recent.push({ 
+                        userName: user.displayName,
+                        username: user.username,
+                        ...doc.data() 
+                    });
+                });
+                
+                recent.sort((a, b) => {
+                    const dateA = a.createdAt?.toDate() || new Date(0);
+                    const dateB = b.createdAt?.toDate() || new Date(0);
+                    return dateB - dateA;
+                });
+                
+                document.getElementById('achievementsLoading').style.display = 'none';
+                document.getElementById('achievementsTable').style.display = 'table';
+                
+                const aTbody = document.getElementById('achievementsBody');
+                aTbody.innerHTML = '';
+                
+                recent.slice(0, 20).forEach(a => {
+                    const initials = a.username.substring(0, 2).toUpperCase();
+                    
+                    aTbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">${initials}</div>
+                                    <div class="user-details">
+                                        <div class="user-name">${a.userName}</div>
+                                        <div class="user-username">@${a.username}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${a.title || 'Untitled'}</td>
+                            <td><span class="badge badge-${a.type || 'achievement'}">${a.type || 'N/A'}</span></td>
+                            <td>${a.date || 'N/A'}</td>
+                            <td>${a.grade || '-'}</td>
+                        </tr>
+                    `;
+                });
+                
+            } catch (error) {
+                console.error('❌ ERROR:', error);
+                alert('Error loading data: ' + error.message);
             }
-            
-            userMap.get(username).achievements.push(doc.data());
-            userMap.get(username).count++;
-        });
+        }
         
-        console.log('Total users:', userMap.size);
-        console.log('All usernames:', Array.from(userMap.keys()));
+        function formatDate(timestamp) {
+            if (!timestamp) return 'Never';
+            try {
+                const date = timestamp.toDate();
+                const now = new Date();
+                const diff = now - date;
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (hours < 1) return 'Just now';
+                if (hours < 24) return `${hours}h ago`;
+                if (days < 7) return `${days}d ago`;
+                
+                return date.toLocaleDateString('en-IN', { 
+                    month: 'short', 
+                    day: 'numeric'
+                });
+            } catch {
+                return 'N/A';
+            }
+        }
         
-        document.getElementById('totalUsers').textContent = userMap.size;
-        document.getElementById('totalAchievements').textContent = allAchievements.size;
-        document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
+        function viewUser(username) {
+            db.collection('users').doc(username).collection('achievements').get()
+                .then(docs => {
+                    const data = docs.docs.map(d => d.data());
+                    console.log('User @' + username, data);
+                    alert(`@${username}\n${docs.size} achievements\n\nCheck console (F12) for details`);
+                });
+        }
         
-        // Build users table
-        const usersData = Array.from(userMap.values());
-        
-        usersData.sort((a, b) => {
-            const dateA = a.achievements[0]?.createdAt?.toDate() || new Date(0);
-            const dateB = b.achievements[0]?.createdAt?.toDate() || new Date(0);
-            return dateB - dateA;
-        });
-        
-        document.getElementById('usersLoading').style.display = 'none';
-        document.getElementById('usersTable').style.display = 'table';
-        
-        const tbody = document.getElementById('usersBody');
-        tbody.innerHTML = '';
-        
-        usersData.forEach((user) => {
-            const latest = user.achievements.sort((a, b) => {
-                const dateA = a.createdAt?.toDate() || new Date(0);
-                const dateB = b.createdAt?.toDate() || new Date(0);
-                return dateB - dateA;
-            })[0];
-            
-            // Get initials from username
-            const initials = user.username.substring(0, 2).toUpperCase();
-            
-            tbody.innerHTML += `
-                <tr>
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">${initials}</div>
-                            <div class="user-details">
-                                <div class="user-name">${user.displayName}</div>
-                                <div class="user-username">@${user.username}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td><strong>${user.count}</strong> entries</td>
-                    <td>${formatDate(latest?.createdAt)}</td>
-                    <td>
-                        <button class="btn-sm btn-primary" onclick="viewUser('${user.username}')">View</button>
-                        <button class="btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
-                    </td>
-                </tr>
-            `;
-        });
-        
-        // Achievements table
-        const recent = [];
-        allAchievements.forEach(doc => {
-            const username = doc.ref.path.split('/')[1];
-            const user = userMap.get(username);
-            recent.push({ 
-                userName: user.displayName,
-                username: user.username,
-                ...doc.data() 
-            });
-        });
-        
-        recent.sort((a, b) => {
-            const dateA = a.createdAt?.toDate() || new Date(0);
-            const dateB = b.createdAt?.toDate() || new Date(0);
-            return dateB - dateA;
-        });
-        
-        document.getElementById('achievementsLoading').style.display = 'none';
-        document.getElementById('achievementsTable').style.display = 'table';
-        
-        const aTbody = document.getElementById('achievementsBody');
-        aTbody.innerHTML = '';
-        
-        recent.slice(0, 20).forEach(a => {
-            const initials = a.username.substring(0, 2).toUpperCase();
-            
-            aTbody.innerHTML += `
-                <tr>
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">${initials}</div>
-                            <div class="user-details">
-                                <div class="user-name">${a.userName}</div>
-                                <div class="user-username">@${a.username}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${a.title || 'Untitled'}</td>
-                    <td><span class="badge badge-${a.type || 'achievement'}">${a.type || 'N/A'}</span></td>
-                    <td>${a.date || 'N/A'}</td>
-                    <td>${a.grade || '-'}</td>
-                </tr>
-            `;
-        });
-        
-    } catch (error) {
-        console.error('ERROR:', error);
-        alert('Error loading data: ' + error.message);
-    }
-}
-
-function viewUser(username) {
-    db.collection('users').doc(username).collection('achievements').get()
-        .then(docs => {
-            const data = docs.docs.map(d => d.data());
-            console.log('User @' + username, data);
-            alert(`@${username}\n${docs.size} achievements\n\nCheck console (F12) for details`);
-        });
-}
-
-function deleteUser(username) {
-    if (confirm(`Delete @${username}?\n\nThis will delete ALL their achievements!`)) {
-        db.collection('users').doc(username).collection('achievements').get()
-            .then(snap => {
-                const batch = db.batch();
-                snap.docs.forEach(doc => batch.delete(doc.ref));
-                return batch.commit();
-            })
-            .then(() => {
-                alert('✅ User @' + username + ' deleted!');
-                loadData();
-            })
-            .catch(e => alert('Error: ' + e.message));
-    }
-}
+        function deleteUser(username) {
+            if (confirm(`Delete @${username}?\n\nThis will delete ALL their achievements!`)) {
+                db.collection('users').doc(username).collection('achievements').get()
+                    .then(snap => {
+                        const batch = db.batch();
+                        snap.docs.forEach(doc => batch.delete(doc.ref));
+                        return batch.commit();
+                    })
+                    .then(() => {
+                        alert('✅ User @' + username + ' deleted!');
+                        loadData();
+                    })
+                    .catch(e => alert('Error: ' + e.message));
+            }
+        }
+    </script>
+</body>
+</html>
