@@ -27,29 +27,11 @@
             width: 100%;
             max-width: 400px;
         }
-        .login-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        .login-header h1 {
-            font-size: 1.75rem;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-        .login-header p {
-            color: #6b7280;
-            font-size: 0.875rem;
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #374151;
-            font-weight: 500;
-            font-size: 0.875rem;
-        }
+        .login-header { text-align: center; margin-bottom: 2rem; }
+        .login-header h1 { font-size: 1.75rem; color: #1f2937; margin-bottom: 0.5rem; }
+        .login-header p { color: #6b7280; font-size: 0.875rem; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; font-size: 0.875rem; }
         .form-group input {
             width: 100%;
             padding: 0.75rem;
@@ -58,11 +40,7 @@
             font-size: 1rem;
             transition: all 0.2s;
         }
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+        .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
         .btn-login {
             width: 100%;
             padding: 0.875rem;
@@ -87,12 +65,7 @@
             display: none;
         }
         
-        .dashboard {
-            display: none;
-            padding: 2rem;
-            background: #f3f4f6;
-            min-height: 100vh;
-        }
+        .dashboard { display: none; padding: 2rem; background: #f3f4f6; min-height: 100vh; }
         .dashboard-header {
             display: flex;
             justify-content: space-between;
@@ -103,36 +76,20 @@
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .dashboard-header h1 {
-            color: #1f2937;
-            font-size: 1.75rem;
-        }
-        .realtime-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: #10b981;
-            color: white;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-right: 1rem;
-        }
-        .realtime-dot {
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
+        .dashboard-header h1 { color: #1f2937; font-size: 1.75rem; }
         .btn-logout {
             padding: 0.625rem 1.25rem;
             background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .btn-refresh {
+            padding: 0.625rem 1.25rem;
+            background: #10b981;
             color: white;
             border: none;
             border-radius: 8px;
@@ -146,37 +103,14 @@
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
-        .stat-card {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
+        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         .stat-number { font-size: 2.5rem; font-weight: 700; color: #667eea; }
         .stat-label { color: #6b7280; margin-top: 0.5rem; }
-        .section {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 1.5rem;
-        }
+        .section { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
         .section h2 { margin-bottom: 1rem; color: #1f2937; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        th {
-            background: #f9fafb;
-            font-weight: 600;
-            color: #374151;
-            font-size: 0.875rem;
-        }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; font-size: 0.875rem; }
         .badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -201,21 +135,30 @@
         .btn-primary { background: #667eea; color: white; }
         .loading { text-align: center; padding: 2rem; color: #6b7280; }
         .no-data { text-align: center; padding: 2rem; color: #6b7280; }
-        .user-email { 
-            font-weight: 600;
-            color: #1f2937;
+        .username { 
+            font-weight: 700; 
+            color: #667eea; 
+            font-size: 1.1rem;
         }
-        .user-id-small { 
-            font-family: monospace; 
-            font-size: 0.75rem; 
-            color: #9ca3af;
-            display: block;
-            margin-top: 0.25rem;
+        .user-badge {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .success-box {
+            background: #d1fae5;
+            color: #065f46;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-weight: 600;
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
             <div class="login-header">
@@ -237,44 +180,45 @@
         </div>
     </div>
 
-    <!-- Dashboard -->
     <div class="dashboard" id="dashboard">
         <div class="container">
             <div class="dashboard-header">
                 <h1>🎓 AcadGenie Admin Panel</h1>
                 <div>
-                    <span class="realtime-badge">
-                        <span class="realtime-dot"></span>
-                        Live Updates
-                    </span>
+                    <button class="btn-refresh" onclick="forceRefresh()">🔄 Refresh</button>
                     <button class="btn-logout" onclick="logout()">Logout</button>
                 </div>
             </div>
             
+            <div class="success-box" id="successBox" style="display: none;">
+                ✅ Loaded data successfully!
+            </div>
+            
             <div class="stats">
                 <div class="stat-card">
-                    <div class="stat-number" id="totalUsers">...</div>
+                    <div class="stat-number" id="totalUsers">0</div>
                     <div class="stat-label">Total Users</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="totalAchievements">...</div>
+                    <div class="stat-number" id="totalAchievements">0</div>
                     <div class="stat-label">Total Achievements</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="avgPerUser">...</div>
+                    <div class="stat-number" id="avgPerUser">0</div>
                     <div class="stat-label">Avg per User</div>
                 </div>
             </div>
 
             <div class="section">
-                <h2>All Users (Total: <span id="userCount">0</span>) - Auto-updating</h2>
-                <div id="usersLoading" class="loading">Loading users...</div>
+                <h2>All Users by Username</h2>
+                <div id="usersLoading" class="loading">Loading all users...</div>
                 <div id="usersNoData" class="no-data" style="display: none;">No users found</div>
                 <div style="overflow-x: auto;">
                     <table id="usersTable" style="display: none;">
                         <thead>
                             <tr>
-                                <th>User Email</th>
+                                <th>#</th>
+                                <th>Username</th>
                                 <th>Achievements</th>
                                 <th>Latest Activity</th>
                                 <th>Actions</th>
@@ -286,14 +230,14 @@
             </div>
 
             <div class="section">
-                <h2>Recent Achievements - Live</h2>
+                <h2>Recent Achievements</h2>
                 <div id="achievementsLoading" class="loading">Loading achievements...</div>
                 <div id="achievementsNoData" class="no-data" style="display: none;">No achievements found</div>
                 <div style="overflow-x: auto;">
                     <table id="achievementsTable" style="display: none;">
                         <thead>
                             <tr>
-                                <th>User Email</th>
+                                <th>Username</th>
                                 <th>Title</th>
                                 <th>Type</th>
                                 <th>Date</th>
@@ -324,16 +268,11 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        let unsubscribeUsers = null;
-        let unsubscribeAchievements = null;
-        
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log('✅ Admin logged in:', user.email);
+                console.log('✅ Admin logged in');
                 showDashboard();
             } else {
-                if (unsubscribeUsers) unsubscribeUsers();
-                if (unsubscribeAchievements) unsubscribeAchievements();
                 document.getElementById('loginScreen').style.display = 'flex';
                 document.getElementById('dashboard').style.display = 'none';
             }
@@ -363,88 +302,85 @@
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-            setupRealtimeListeners();
+            loadAllData();
         }
         
-        function logout() {
-            auth.signOut();
-        }
+        function logout() { auth.signOut(); }
+        function forceRefresh() { loadAllData(); }
         
-        // REALTIME LISTENERS - Auto-update on new data!
-        function setupRealtimeListeners() {
-            console.log('🔄 Setting up realtime listeners...');
-            
-            // Listen to ALL user documents in realtime
-            unsubscribeUsers = db.collection('users').onSnapshot(async (snapshot) => {
-                console.log('🔥 Users updated! Total:', snapshot.size);
-                await loadUsersRealtime(snapshot);
-            });
-            
-            // Listen to achievements changes (using collectionGroup for all users)
-            // Note: This requires a composite index in Firestore
-            loadAchievementsRealtime();
-        }
-        
-        async function loadUsersRealtime(snapshot) {
+        async function loadAllData() {
             try {
-                if (snapshot.empty) {
+                console.log('🔍 Scanning for all users (by USERNAME)...');
+                
+                // Use collectionGroup to get ALL achievements
+                const allAchievements = await db.collectionGroup('achievements').get();
+                
+                console.log('📊 Total achievements found:', allAchievements.size);
+                
+                if (allAchievements.empty) {
                     document.getElementById('totalUsers').textContent = '0';
-                    document.getElementById('userCount').textContent = '0';
+                    document.getElementById('totalAchievements').textContent = '0';
+                    document.getElementById('avgPerUser').textContent = '0';
                     document.getElementById('usersLoading').style.display = 'none';
                     document.getElementById('usersNoData').style.display = 'block';
+                    document.getElementById('achievementsLoading').style.display = 'none';
+                    document.getElementById('achievementsNoData').style.display = 'block';
                     return;
                 }
                 
-                const usersData = [];
+                // Extract usernames from paths
+                const userMap = new Map();
                 
-                // Get authentication emails
-                const userEmails = new Map();
-                
-                for (const userDoc of snapshot.docs) {
-                    const userId = userDoc.id;
-                    const userData = userDoc.data();
+                allAchievements.forEach(doc => {
+                    const path = doc.ref.path; 
+                    // Path format: "users/USERNAME/achievements/DOC_ID"
+                    const parts = path.split('/');
+                    const username = parts[1]; // Extract USERNAME
                     
-                    // Get email from user document or from auth
-                    let userEmail = 'No email';
-                    if (userData && userData.email) {
-                        userEmail = userData.email;
-                    }
+                    console.log('👤 Found user:', username);
                     
-                    // Get achievements count
-                    const achievementsRef = await db.collection('users')
-                        .doc(userId)
-                        .collection('achievements')
-                        .get();
-                    
-                    const achievementCount = achievementsRef.size;
-                    
-                    // Get latest activity
-                    let latestDate = null;
-                    if (!achievementsRef.empty) {
-                        const sorted = achievementsRef.docs.sort((a, b) => {
-                            const dateA = a.data().createdAt?.toDate() || new Date(0);
-                            const dateB = b.data().createdAt?.toDate() || new Date(0);
-                            return dateB - dateA;
+                    if (!userMap.has(username)) {
+                        userMap.set(username, {
+                            username: username,
+                            achievements: [],
+                            count: 0
                         });
-                        latestDate = sorted[0].data().createdAt;
                     }
+                    
+                    const data = doc.data();
+                    userMap.get(username).achievements.push(data);
+                    userMap.get(username).count++;
+                });
+                
+                console.log('✅ Total unique users:', userMap.size);
+                console.log('📋 Usernames:', Array.from(userMap.keys()));
+                
+                // Show success message
+                document.getElementById('successBox').style.display = 'block';
+                document.getElementById('successBox').textContent = 
+                    `✅ Found ${userMap.size} users with ${allAchievements.size} achievements`;
+                
+                // Update stats
+                document.getElementById('totalUsers').textContent = userMap.size;
+                document.getElementById('totalAchievements').textContent = allAchievements.size;
+                document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
+                
+                // Build users table
+                const usersData = [];
+                for (const [username, data] of userMap) {
+                    // Get latest activity
+                    const sorted = data.achievements.sort((a, b) => {
+                        const dateA = a.createdAt?.toDate() || new Date(0);
+                        const dateB = b.createdAt?.toDate() || new Date(0);
+                        return dateB - dateA;
+                    });
                     
                     usersData.push({
-                        id: userId,
-                        email: userEmail,
-                        achievementCount: achievementCount,
-                        latestActivity: latestDate
+                        username: username,
+                        count: data.count,
+                        latestActivity: sorted[0].createdAt || null
                     });
                 }
-                
-                // Update UI
-                document.getElementById('totalUsers').textContent = usersData.length;
-                document.getElementById('userCount').textContent = usersData.length;
-                document.getElementById('usersLoading').style.display = 'none';
-                document.getElementById('usersTable').style.display = 'table';
-                
-                const tbody = document.getElementById('usersBody');
-                tbody.innerHTML = '';
                 
                 // Sort by latest activity
                 usersData.sort((a, b) => {
@@ -453,98 +389,44 @@
                     return dateB - dateA;
                 });
                 
+                // Render users table
+                document.getElementById('usersLoading').style.display = 'none';
+                document.getElementById('usersTable').style.display = 'table';
+                
+                const tbody = document.getElementById('usersBody');
+                tbody.innerHTML = '';
+                
                 usersData.forEach((user, index) => {
                     const row = `
                         <tr>
+                            <td>${index + 1}</td>
                             <td>
-                                <div class="user-email">${user.email}</div>
-                                <span class="user-id-small">${user.id}</span>
+                                <span class="user-badge">@${user.username}</span>
                             </td>
-                            <td><strong>${user.achievementCount}</strong> entries</td>
+                            <td><strong>${user.count}</strong> entries</td>
                             <td>${formatDate(user.latestActivity)}</td>
                             <td>
-                                <button class="btn btn-primary" onclick="viewUserData('${user.id}')">View</button>
-                                <button class="btn btn-danger" onclick="deleteUser('${user.id}', '${user.email}')">Delete</button>
+                                <button class="btn btn-primary" onclick="viewUserData('${user.username}')">View</button>
+                                <button class="btn btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
                             </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
                 });
                 
-            } catch (error) {
-                console.error('❌ Error loading users:', error);
-            }
-        }
-        
-        async function loadAchievementsRealtime() {
-            try {
-                let totalCount = 0;
-                const allAchievements = [];
-                
-                const usersSnapshot = await db.collection('users').get();
-                
-                for (const userDoc of usersSnapshot.docs) {
-                    const userId = userDoc.id;
-                    const userEmail = userDoc.data().email || userId;
+                // Render achievements table
+                const recentAchievements = [];
+                allAchievements.forEach(doc => {
+                    const path = doc.ref.path;
+                    const username = path.split('/')[1];
                     
-                    // Listen to each user's achievements in realtime
-                    db.collection('users')
-                        .doc(userId)
-                        .collection('achievements')
-                        .onSnapshot((achievementsSnapshot) => {
-                            // This will trigger on any change
-                            loadAchievementsData();
-                        });
-                }
-                
-                loadAchievementsData();
-                
-            } catch (error) {
-                console.error('❌ Error:', error);
-            }
-        }
-        
-        async function loadAchievementsData() {
-            try {
-                let totalCount = 0;
-                const allAchievements = [];
-                
-                const usersSnapshot = await db.collection('users').get();
-                
-                for (const userDoc of usersSnapshot.docs) {
-                    const userId = userDoc.id;
-                    const userEmail = userDoc.data().email || 'No email';
-                    
-                    const achievementsSnapshot = await db.collection('users')
-                        .doc(userId)
-                        .collection('achievements')
-                        .get();
-                    
-                    totalCount += achievementsSnapshot.size;
-                    
-                    achievementsSnapshot.forEach(doc => {
-                        allAchievements.push({
-                            userId: userId,
-                            userEmail: userEmail,
-                            id: doc.id,
-                            ...doc.data()
-                        });
+                    recentAchievements.push({
+                        username: username,
+                        ...doc.data()
                     });
-                }
+                });
                 
-                document.getElementById('totalAchievements').textContent = totalCount;
-                
-                const userCount = usersSnapshot.size;
-                const avgPerUser = userCount > 0 ? (totalCount / userCount).toFixed(1) : 0;
-                document.getElementById('avgPerUser').textContent = avgPerUser;
-                
-                if (allAchievements.length === 0) {
-                    document.getElementById('achievementsLoading').style.display = 'none';
-                    document.getElementById('achievementsNoData').style.display = 'block';
-                    return;
-                }
-                
-                allAchievements.sort((a, b) => {
+                recentAchievements.sort((a, b) => {
                     const dateA = a.createdAt?.toDate() || new Date(0);
                     const dateB = b.createdAt?.toDate() || new Date(0);
                     return dateB - dateA;
@@ -553,26 +435,27 @@
                 document.getElementById('achievementsLoading').style.display = 'none';
                 document.getElementById('achievementsTable').style.display = 'table';
                 
-                const tbody = document.getElementById('achievementsBody');
-                tbody.innerHTML = '';
+                const aTbody = document.getElementById('achievementsBody');
+                aTbody.innerHTML = '';
                 
-                allAchievements.slice(0, 30).forEach(achievement => {
+                recentAchievements.slice(0, 30).forEach(achievement => {
                     const row = `
                         <tr>
-                            <td>
-                                <div class="user-email">${achievement.userEmail}</div>
-                            </td>
+                            <td><span class="username">@${achievement.username}</span></td>
                             <td>${achievement.title || 'Untitled'}</td>
                             <td><span class="badge badge-${achievement.type || 'achievement'}">${achievement.type || 'N/A'}</span></td>
                             <td>${achievement.date || 'N/A'}</td>
                             <td>${achievement.grade || '-'}</td>
                         </tr>
                     `;
-                    tbody.innerHTML += row;
+                    aTbody.innerHTML += row;
                 });
                 
+                console.log('✅ Dashboard loaded successfully!');
+                
             } catch (error) {
-                console.error('❌ Error loading achievements:', error);
+                console.error('❌ ERROR:', error);
+                alert('Error loading data: ' + error.message + '\n\nCheck console (F12) for details');
             }
         }
         
@@ -582,12 +465,10 @@
                 const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
                 const now = new Date();
                 const diff = now - date;
-                const minutes = Math.floor(diff / 60000);
                 const hours = Math.floor(diff / 3600000);
                 const days = Math.floor(diff / 86400000);
                 
-                if (minutes < 1) return 'Just now';
-                if (minutes < 60) return `${minutes}m ago`;
+                if (hours < 1) return 'Just now';
                 if (hours < 24) return `${hours}h ago`;
                 if (days < 7) return `${days}d ago`;
                 
@@ -601,33 +482,29 @@
             }
         }
         
-        async function viewUserData(userId) {
+        async function viewUserData(username) {
             try {
-                const achievements = await db.collection('users').doc(userId).collection('achievements').get();
+                const achievements = await db.collection('users').doc(username).collection('achievements').get();
                 const data = achievements.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('👤 User Data:', userId);
+                console.log('👤 User: @' + username);
                 console.table(data);
-                alert(`User ID: ${userId}\n\nTotal Achievements: ${achievements.size}\n\nFull data in console (F12)`);
+                alert(`Username: @${username}\n\nTotal: ${achievements.size} achievements\n\nCheck console (F12) for full data`);
             } catch (error) {
                 alert('Error: ' + error.message);
             }
         }
         
-        function deleteUser(userId, userEmail) {
-            if (confirm(`⚠️ DELETE USER?\n\nEmail: ${userEmail}\nID: ${userId}\n\nThis will delete ALL data!\n\nContinue?`)) {
-                db.collection('users').doc(userId).collection('achievements').get()
+        function deleteUser(username) {
+            if (confirm(`⚠️ DELETE USER?\n\nUsername: @${username}\n\nThis will delete ALL their data!\n\nContinue?`)) {
+                db.collection('users').doc(username).collection('achievements').get()
                     .then(snapshot => {
                         const batch = db.batch();
                         snapshot.docs.forEach(doc => batch.delete(doc.ref));
                         return batch.commit();
                     })
                     .then(() => {
-                        // Also delete user document
-                        return db.collection('users').doc(userId).delete();
-                    })
-                    .then(() => {
-                        alert('✅ User deleted!');
-                        // Realtime listener will auto-refresh
+                        alert('✅ User @' + username + ' deleted!');
+                        loadAllData();
                     })
                     .catch(error => {
                         alert('Error: ' + error.message);
