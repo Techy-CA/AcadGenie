@@ -576,218 +576,171 @@
             }
         });
         
-        async function loadData() {
-            try {
-                console.log('Loading all data...');
-                
-                const allAchievements = await db.collectionGroup('achievements').get();
-                
-                if (allAchievements.empty) {
-                    document.getElementById('totalUsers').textContent = '0';
-                    document.getElementById('totalAchievements').textContent = '0';
-                    document.getElementById('avgPerUser').textContent = '0';
-                    document.getElementById('usersLoading').style.display = 'none';
-                    document.getElementById('usersEmpty').style.display = 'block';
-                    document.getElementById('achievementsLoading').style.display = 'none';
-                    document.getElementById('achievementsEmpty').style.display = 'block';
-                    return;
-                }
-                
-                const userMap = new Map();
-                
-                // Collect all user data
-                allAchievements.forEach(doc => {
-                    const path = doc.ref.path;
-                    const userId = path.split('/')[1]; // This is the UID from Firebase Auth
-                    
-                    if (!userMap.has(userId)) {
-                        userMap.set(userId, {
-                            userId: userId,
-                            displayName: null,
-                            email: null,
-                            achievements: [],
-                            count: 0
-                        });
-                    }
-                    
-                    userMap.get(userId).achievements.push(doc.data());
-                    userMap.get(userId).count++;
-                });
-                
-                console.log('Users found:', userMap.size);
-                
-                // Get user details from Firebase Auth
-                for (const [userId, userData] of userMap) {
-                    try {
-                        // Try to get user info from Auth (requires Admin SDK, so fallback to stored data)
-                        // We'll use displayName from achievements if available
-                        const firstAchievement = userData.achievements[0];
-                        if (firstAchievement && firstAchievement.userName) {
-                            userData.displayName = firstAchievement.userName;
-                        }
-                        
-                        // Try to extract email from userId if it looks like an email
-                        if (userId.includes('@')) {
-                            userData.email = userId;
-                            if (!userData.displayName) {
-                                userData.displayName = userId.split('@')[0];
-                            }
-                        } else {
-                            // If userId is not email, use it as username
-                            userData.displayName = userData.displayName || userId;
-                            userData.email = userId;
-                        }
-                    } catch (e) {
-                        userData.displayName = userId;
-                        userData.email = userId;
-                    }
-                }
-                
-                document.getElementById('totalUsers').textContent = userMap.size;
-                document.getElementById('totalAchievements').textContent = allAchievements.size;
-                document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
-                
-                // Build users table
-                const usersData = Array.from(userMap.values());
-                
-                usersData.sort((a, b) => {
-                    const dateA = a.achievements[0]?.createdAt?.toDate() || new Date(0);
-                    const dateB = b.achievements[0]?.createdAt?.toDate() || new Date(0);
-                    return dateB - dateA;
-                });
-                
-                document.getElementById('usersLoading').style.display = 'none';
-                document.getElementById('usersTable').style.display = 'table';
-                
-                const tbody = document.getElementById('usersBody');
-                tbody.innerHTML = '';
-                
-                usersData.forEach((user) => {
-                    const latest = user.achievements.sort((a, b) => {
-                        const dateA = a.createdAt?.toDate() || new Date(0);
-                        const dateB = b.createdAt?.toDate() || new Date(0);
-                        return dateB - dateA;
-                    })[0];
-                    
-                    const initials = user.displayName ? user.displayName.substring(0, 2).toUpperCase() : '??';
-                    
-                    tbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="user-info">
-                                    <div class="user-avatar">${initials}</div>
-                                    <div class="user-details">
-                                        <div class="user-name">${user.displayName || 'Unknown User'}</div>
-                                        <div class="user-username">@${user.email}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td><strong>${user.count}</strong> entries</td>
-                            <td>${formatDate(latest?.createdAt)}</td>
-                            <td>
-                                <button class="btn-sm btn-primary" onclick="viewUser('${user.userId}', '${user.displayName}')">View</button>
-                                <button class="btn-sm btn-danger" onclick="deleteUser('${user.userId}', '${user.displayName}')">Delete</button>
-                            </td>
-                        </tr>
-                    `;
-                });
-                
-                // Achievements table
-                const recent = [];
-                allAchievements.forEach(doc => {
-                    const userId = doc.ref.path.split('/')[1];
-                    const user = userMap.get(userId);
-                    recent.push({ 
-                        userName: user.displayName,
-                        userEmail: user.email,
-                        ...doc.data() 
-                    });
-                });
-                
-                recent.sort((a, b) => {
-                    const dateA = a.createdAt?.toDate() || new Date(0);
-                    const dateB = b.createdAt?.toDate() || new Date(0);
-                    return dateB - dateA;
-                });
-                
-                document.getElementById('achievementsLoading').style.display = 'none';
-                document.getElementById('achievementsTable').style.display = 'table';
-                
-                const aTbody = document.getElementById('achievementsBody');
-                aTbody.innerHTML = '';
-                
-                recent.slice(0, 20).forEach(a => {
-                    const initials = a.userName ? a.userName.substring(0, 2).toUpperCase() : '??';
-                    
-                    aTbody.innerHTML += `
-                        <tr>
-                            <td>
-                                <div class="user-info">
-                                    <div class="user-avatar">${initials}</div>
-                                    <div class="user-details">
-                                        <div class="user-name">${a.userName || 'Unknown'}</div>
-                                        <div class="user-username">@${a.userEmail}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td>${a.title || 'Untitled'}</td>
-                            <td><span class="badge badge-${a.type || 'achievement'}">${a.type || 'N/A'}</span></td>
-                            <td>${a.date || 'N/A'}</td>
-                            <td>${a.grade || '-'}</td>
-                        </tr>
-                    `;
-                });
-                
-            } catch (error) {
-                console.error('ERROR:', error);
-                alert('Error loading data: ' + error.message);
-            }
+       async function loadData() {
+    try {
+        console.log('Loading all data...');
+        
+        const allAchievements = await db.collectionGroup('achievements').get();
+        
+        if (allAchievements.empty) {
+            document.getElementById('totalUsers').textContent = '0';
+            document.getElementById('totalAchievements').textContent = '0';
+            document.getElementById('avgPerUser').textContent = '0';
+            document.getElementById('usersLoading').style.display = 'none';
+            document.getElementById('usersEmpty').style.display = 'block';
+            document.getElementById('achievementsLoading').style.display = 'none';
+            document.getElementById('achievementsEmpty').style.display = 'block';
+            return;
         }
         
-        function formatDate(timestamp) {
-            if (!timestamp) return 'Never';
-            try {
-                const date = timestamp.toDate();
-                const now = new Date();
-                const diff = now - date;
-                const hours = Math.floor(diff / 3600000);
-                const days = Math.floor(diff / 86400000);
-                
-                if (hours < 1) return 'Just now';
-                if (hours < 24) return `${hours}h ago`;
-                if (days < 7) return `${days}d ago`;
-                
-                return date.toLocaleDateString('en-IN', { 
-                    month: 'short', 
-                    day: 'numeric'
-                });
-            } catch {
-                return 'N/A';
-            }
-        }
+        const userMap = new Map();
         
-        async function viewUser(userId, userName) {
-            const docs = await db.collection('users').doc(userId).collection('achievements').get();
+        // Collect all user data
+        allAchievements.forEach(doc => {
+            const path = doc.ref.path;
+            const username = path.split('/')[1]; // This IS the username!
+            
+            console.log('Found username:', username);
+            
+            if (!userMap.has(username)) {
+                userMap.set(username, {
+                    username: username,
+                    displayName: username, // Username as display name
+                    achievements: [],
+                    count: 0
+                });
+            }
+            
+            userMap.get(username).achievements.push(doc.data());
+            userMap.get(username).count++;
+        });
+        
+        console.log('Total users:', userMap.size);
+        console.log('All usernames:', Array.from(userMap.keys()));
+        
+        document.getElementById('totalUsers').textContent = userMap.size;
+        document.getElementById('totalAchievements').textContent = allAchievements.size;
+        document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
+        
+        // Build users table
+        const usersData = Array.from(userMap.values());
+        
+        usersData.sort((a, b) => {
+            const dateA = a.achievements[0]?.createdAt?.toDate() || new Date(0);
+            const dateB = b.achievements[0]?.createdAt?.toDate() || new Date(0);
+            return dateB - dateA;
+        });
+        
+        document.getElementById('usersLoading').style.display = 'none';
+        document.getElementById('usersTable').style.display = 'table';
+        
+        const tbody = document.getElementById('usersBody');
+        tbody.innerHTML = '';
+        
+        usersData.forEach((user) => {
+            const latest = user.achievements.sort((a, b) => {
+                const dateA = a.createdAt?.toDate() || new Date(0);
+                const dateB = b.createdAt?.toDate() || new Date(0);
+                return dateB - dateA;
+            })[0];
+            
+            // Get initials from username
+            const initials = user.username.substring(0, 2).toUpperCase();
+            
+            tbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">${initials}</div>
+                            <div class="user-details">
+                                <div class="user-name">${user.displayName}</div>
+                                <div class="user-username">@${user.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><strong>${user.count}</strong> entries</td>
+                    <td>${formatDate(latest?.createdAt)}</td>
+                    <td>
+                        <button class="btn-sm btn-primary" onclick="viewUser('${user.username}')">View</button>
+                        <button class="btn-sm btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                    </td>
+                </tr>
+            `;
+        });
+        
+        // Achievements table
+        const recent = [];
+        allAchievements.forEach(doc => {
+            const username = doc.ref.path.split('/')[1];
+            const user = userMap.get(username);
+            recent.push({ 
+                userName: user.displayName,
+                username: user.username,
+                ...doc.data() 
+            });
+        });
+        
+        recent.sort((a, b) => {
+            const dateA = a.createdAt?.toDate() || new Date(0);
+            const dateB = b.createdAt?.toDate() || new Date(0);
+            return dateB - dateA;
+        });
+        
+        document.getElementById('achievementsLoading').style.display = 'none';
+        document.getElementById('achievementsTable').style.display = 'table';
+        
+        const aTbody = document.getElementById('achievementsBody');
+        aTbody.innerHTML = '';
+        
+        recent.slice(0, 20).forEach(a => {
+            const initials = a.username.substring(0, 2).toUpperCase();
+            
+            aTbody.innerHTML += `
+                <tr>
+                    <td>
+                        <div class="user-info">
+                            <div class="user-avatar">${initials}</div>
+                            <div class="user-details">
+                                <div class="user-name">${a.userName}</div>
+                                <div class="user-username">@${a.username}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>${a.title || 'Untitled'}</td>
+                    <td><span class="badge badge-${a.type || 'achievement'}">${a.type || 'N/A'}</span></td>
+                    <td>${a.date || 'N/A'}</td>
+                    <td>${a.grade || '-'}</td>
+                </tr>
+            `;
+        });
+        
+    } catch (error) {
+        console.error('ERROR:', error);
+        alert('Error loading data: ' + error.message);
+    }
+}
+
+function viewUser(username) {
+    db.collection('users').doc(username).collection('achievements').get()
+        .then(docs => {
             const data = docs.docs.map(d => d.data());
-            console.log('User:', userName, data);
-            alert(`${userName}\n${docs.size} achievements\n\nCheck console (F12) for details`);
-        }
-        
-        function deleteUser(userId, userName) {
-            if (confirm(`Delete ${userName}?\n\nThis will delete ALL their achievements!`)) {
-                db.collection('users').doc(userId).collection('achievements').get()
-                    .then(snap => {
-                        const batch = db.batch();
-                        snap.docs.forEach(doc => batch.delete(doc.ref));
-                        return batch.commit();
-                    })
-                    .then(() => {
-                        alert('✅ User deleted!');
-                        loadData();
-                    })
-                    .catch(e => alert('Error: ' + e.message));
-            }
-        }
-    </script>
-</body>
-</html>
+            console.log('User @' + username, data);
+            alert(`@${username}\n${docs.size} achievements\n\nCheck console (F12) for details`);
+        });
+}
+
+function deleteUser(username) {
+    if (confirm(`Delete @${username}?\n\nThis will delete ALL their achievements!`)) {
+        db.collection('users').doc(username).collection('achievements').get()
+            .then(snap => {
+                const batch = db.batch();
+                snap.docs.forEach(doc => batch.delete(doc.ref));
+                return batch.commit();
+            })
+            .then(() => {
+                alert('✅ User @' + username + ' deleted!');
+                loadData();
+            })
+            .catch(e => alert('Error: ' + e.message));
+    }
+}
