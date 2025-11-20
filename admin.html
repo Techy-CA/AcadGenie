@@ -12,7 +12,6 @@
             min-height: 100vh;
         }
         
-        /* Login Screen */
         .login-screen {
             display: flex;
             align-items: center;
@@ -76,13 +75,8 @@
             cursor: pointer;
             transition: transform 0.2s;
         }
-        .btn-login:hover {
-            transform: translateY(-2px);
-        }
-        .btn-login:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
+        .btn-login:hover { transform: translateY(-2px); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
         .error-message {
             background: #fee2e2;
             color: #dc2626;
@@ -92,17 +86,7 @@
             font-size: 0.875rem;
             display: none;
         }
-        .info-message {
-            background: #dbeafe;
-            color: #1e40af;
-            padding: 0.5rem;
-            border-radius: 6px;
-            margin-top: 1rem;
-            font-size: 0.75rem;
-            text-align: center;
-        }
         
-        /* Dashboard */
         .dashboard {
             display: none;
             padding: 2rem;
@@ -122,6 +106,29 @@
         .dashboard-header h1 {
             color: #1f2937;
             font-size: 1.75rem;
+        }
+        .realtime-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #10b981;
+            color: white;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+        .realtime-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
         .btn-logout {
             padding: 0.625rem 1.25rem;
@@ -154,10 +161,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             margin-bottom: 1.5rem;
         }
-        .section h2 {
-            margin-bottom: 1rem;
-            color: #1f2937;
-        }
+        .section h2 { margin-bottom: 1rem; color: #1f2937; }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -197,6 +201,17 @@
         .btn-primary { background: #667eea; color: white; }
         .loading { text-align: center; padding: 2rem; color: #6b7280; }
         .no-data { text-align: center; padding: 2rem; color: #6b7280; }
+        .user-email { 
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .user-id-small { 
+            font-family: monospace; 
+            font-size: 0.75rem; 
+            color: #9ca3af;
+            display: block;
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -219,10 +234,6 @@
                 </div>
                 <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
             </form>
-            <div class="info-message">
-                First time? Create admin account in Firebase Console<br>
-                Email: admin@acadgenie.com | Pass: Admin@123
-            </div>
         </div>
     </div>
 
@@ -231,7 +242,13 @@
         <div class="container">
             <div class="dashboard-header">
                 <h1>🎓 AcadGenie Admin Panel</h1>
-                <button class="btn-logout" onclick="logout()">Logout</button>
+                <div>
+                    <span class="realtime-badge">
+                        <span class="realtime-dot"></span>
+                        Live Updates
+                    </span>
+                    <button class="btn-logout" onclick="logout()">Logout</button>
+                </div>
             </div>
             
             <div class="stats">
@@ -250,38 +267,42 @@
             </div>
 
             <div class="section">
-                <h2>All Users</h2>
+                <h2>All Users (Total: <span id="userCount">0</span>) - Auto-updating</h2>
                 <div id="usersLoading" class="loading">Loading users...</div>
                 <div id="usersNoData" class="no-data" style="display: none;">No users found</div>
-                <table id="usersTable" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>User ID</th>
-                            <th>Achievements</th>
-                            <th>Latest Activity</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersBody"></tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table id="usersTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>User Email</th>
+                                <th>Achievements</th>
+                                <th>Latest Activity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="section">
-                <h2>Recent Achievements</h2>
+                <h2>Recent Achievements - Live</h2>
                 <div id="achievementsLoading" class="loading">Loading achievements...</div>
                 <div id="achievementsNoData" class="no-data" style="display: none;">No achievements found</div>
-                <table id="achievementsTable" style="display: none;">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Date</th>
-                            <th>Grade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="achievementsBody"></tbody>
-                </table>
+                <div style="overflow-x: auto;">
+                    <table id="achievementsTable" style="display: none;">
+                        <thead>
+                            <tr>
+                                <th>User Email</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="achievementsBody"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -291,7 +312,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     
     <script>
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyACDVh6WgW_frUT69i5cxCH6Gsjc2DhL8U",
             authDomain: "acadgenie-aa1f0.firebaseapp.com",
@@ -304,18 +324,21 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
         
-        // Check if admin is logged in
+        let unsubscribeUsers = null;
+        let unsubscribeAchievements = null;
+        
         auth.onAuthStateChanged((user) => {
             if (user) {
-                console.log('Admin authenticated:', user.email);
+                console.log('✅ Admin logged in:', user.email);
                 showDashboard();
             } else {
+                if (unsubscribeUsers) unsubscribeUsers();
+                if (unsubscribeAchievements) unsubscribeAchievements();
                 document.getElementById('loginScreen').style.display = 'flex';
                 document.getElementById('dashboard').style.display = 'none';
             }
         });
         
-        // Login form handler
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('adminEmail').value;
@@ -329,9 +352,7 @@
             
             try {
                 await auth.signInWithEmailAndPassword(email, password);
-                // Dashboard will load automatically via onAuthStateChanged
             } catch (error) {
-                console.error('Login error:', error);
                 errorMsg.textContent = error.message;
                 errorMsg.style.display = 'block';
                 loginBtn.disabled = false;
@@ -342,34 +363,33 @@
         function showDashboard() {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-            loadDashboard();
+            setupRealtimeListeners();
         }
         
         function logout() {
-            auth.signOut().then(() => {
-                console.log('Admin logged out');
+            auth.signOut();
+        }
+        
+        // REALTIME LISTENERS - Auto-update on new data!
+        function setupRealtimeListeners() {
+            console.log('🔄 Setting up realtime listeners...');
+            
+            // Listen to ALL user documents in realtime
+            unsubscribeUsers = db.collection('users').onSnapshot(async (snapshot) => {
+                console.log('🔥 Users updated! Total:', snapshot.size);
+                await loadUsersRealtime(snapshot);
             });
+            
+            // Listen to achievements changes (using collectionGroup for all users)
+            // Note: This requires a composite index in Firestore
+            loadAchievementsRealtime();
         }
         
-        async function loadDashboard() {
+        async function loadUsersRealtime(snapshot) {
             try {
-                await Promise.all([loadUsers(), loadAchievements()]);
-            } catch (error) {
-                console.error('Dashboard load error:', error);
-            }
-        }
-        
-        async function loadUsers() {
-            try {
-                console.log('Loading users...');
-                
-                const usersRef = db.collection('users');
-                const snapshot = await usersRef.get();
-                
-                console.log('Users found:', snapshot.size);
-                
                 if (snapshot.empty) {
                     document.getElementById('totalUsers').textContent = '0';
+                    document.getElementById('userCount').textContent = '0';
                     document.getElementById('usersLoading').style.display = 'none';
                     document.getElementById('usersNoData').style.display = 'block';
                     return;
@@ -377,9 +397,20 @@
                 
                 const usersData = [];
                 
+                // Get authentication emails
+                const userEmails = new Map();
+                
                 for (const userDoc of snapshot.docs) {
                     const userId = userDoc.id;
+                    const userData = userDoc.data();
                     
+                    // Get email from user document or from auth
+                    let userEmail = 'No email';
+                    if (userData && userData.email) {
+                        userEmail = userData.email;
+                    }
+                    
+                    // Get achievements count
                     const achievementsRef = await db.collection('users')
                         .doc(userId)
                         .collection('achievements')
@@ -387,54 +418,66 @@
                     
                     const achievementCount = achievementsRef.size;
                     
+                    // Get latest activity
                     let latestDate = null;
                     if (!achievementsRef.empty) {
-                        const sortedAchievements = achievementsRef.docs.sort((a, b) => {
+                        const sorted = achievementsRef.docs.sort((a, b) => {
                             const dateA = a.data().createdAt?.toDate() || new Date(0);
                             const dateB = b.data().createdAt?.toDate() || new Date(0);
                             return dateB - dateA;
                         });
-                        latestDate = sortedAchievements[0].data().createdAt;
+                        latestDate = sorted[0].data().createdAt;
                     }
                     
                     usersData.push({
                         id: userId,
+                        email: userEmail,
                         achievementCount: achievementCount,
                         latestActivity: latestDate
                     });
                 }
                 
+                // Update UI
                 document.getElementById('totalUsers').textContent = usersData.length;
+                document.getElementById('userCount').textContent = usersData.length;
                 document.getElementById('usersLoading').style.display = 'none';
                 document.getElementById('usersTable').style.display = 'table';
                 
                 const tbody = document.getElementById('usersBody');
                 tbody.innerHTML = '';
                 
-                usersData.forEach(user => {
+                // Sort by latest activity
+                usersData.sort((a, b) => {
+                    const dateA = a.latestActivity?.toDate() || new Date(0);
+                    const dateB = b.latestActivity?.toDate() || new Date(0);
+                    return dateB - dateA;
+                });
+                
+                usersData.forEach((user, index) => {
                     const row = `
                         <tr>
-                            <td>${user.id.substring(0, 20)}...</td>
-                            <td>${user.achievementCount} entries</td>
+                            <td>
+                                <div class="user-email">${user.email}</div>
+                                <span class="user-id-small">${user.id}</span>
+                            </td>
+                            <td><strong>${user.achievementCount}</strong> entries</td>
                             <td>${formatDate(user.latestActivity)}</td>
                             <td>
                                 <button class="btn btn-primary" onclick="viewUserData('${user.id}')">View</button>
-                                <button class="btn btn-danger" onclick="deleteUser('${user.id}')">Delete</button>
+                                <button class="btn btn-danger" onclick="deleteUser('${user.id}', '${user.email}')">Delete</button>
                             </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
                 });
+                
             } catch (error) {
-                console.error('Error loading users:', error);
-                document.getElementById('usersLoading').innerHTML = 'Error: ' + error.message;
+                console.error('❌ Error loading users:', error);
             }
         }
         
-        async function loadAchievements() {
+        async function loadAchievementsRealtime() {
             try {
-                console.log('Loading achievements...');
-                
                 let totalCount = 0;
                 const allAchievements = [];
                 
@@ -442,11 +485,39 @@
                 
                 for (const userDoc of usersSnapshot.docs) {
                     const userId = userDoc.id;
+                    const userEmail = userDoc.data().email || userId;
+                    
+                    // Listen to each user's achievements in realtime
+                    db.collection('users')
+                        .doc(userId)
+                        .collection('achievements')
+                        .onSnapshot((achievementsSnapshot) => {
+                            // This will trigger on any change
+                            loadAchievementsData();
+                        });
+                }
+                
+                loadAchievementsData();
+                
+            } catch (error) {
+                console.error('❌ Error:', error);
+            }
+        }
+        
+        async function loadAchievementsData() {
+            try {
+                let totalCount = 0;
+                const allAchievements = [];
+                
+                const usersSnapshot = await db.collection('users').get();
+                
+                for (const userDoc of usersSnapshot.docs) {
+                    const userId = userDoc.id;
+                    const userEmail = userDoc.data().email || 'No email';
+                    
                     const achievementsSnapshot = await db.collection('users')
                         .doc(userId)
                         .collection('achievements')
-                        .orderBy('createdAt', 'desc')
-                        .limit(10)
                         .get();
                     
                     totalCount += achievementsSnapshot.size;
@@ -454,13 +525,12 @@
                     achievementsSnapshot.forEach(doc => {
                         allAchievements.push({
                             userId: userId,
+                            userEmail: userEmail,
                             id: doc.id,
                             ...doc.data()
                         });
                     });
                 }
-                
-                console.log('Total achievements:', totalCount);
                 
                 document.getElementById('totalAchievements').textContent = totalCount;
                 
@@ -486,10 +556,12 @@
                 const tbody = document.getElementById('achievementsBody');
                 tbody.innerHTML = '';
                 
-                allAchievements.slice(0, 20).forEach(achievement => {
+                allAchievements.slice(0, 30).forEach(achievement => {
                     const row = `
                         <tr>
-                            <td>${achievement.userId.substring(0, 15)}...</td>
+                            <td>
+                                <div class="user-email">${achievement.userEmail}</div>
+                            </td>
                             <td>${achievement.title || 'Untitled'}</td>
                             <td><span class="badge badge-${achievement.type || 'achievement'}">${achievement.type || 'N/A'}</span></td>
                             <td>${achievement.date || 'N/A'}</td>
@@ -500,19 +572,29 @@
                 });
                 
             } catch (error) {
-                console.error('Error loading achievements:', error);
-                document.getElementById('achievementsLoading').innerHTML = 'Error: ' + error.message;
+                console.error('❌ Error loading achievements:', error);
             }
         }
         
         function formatDate(timestamp) {
-            if (!timestamp) return 'N/A';
+            if (!timestamp) return 'Never';
             try {
                 const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-                return date.toLocaleDateString('en-US', { 
-                    year: 'numeric', 
+                const now = new Date();
+                const diff = now - date;
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (minutes < 1) return 'Just now';
+                if (minutes < 60) return `${minutes}m ago`;
+                if (hours < 24) return `${hours}h ago`;
+                if (days < 7) return `${days}d ago`;
+                
+                return date.toLocaleDateString('en-IN', { 
                     month: 'short', 
-                    day: 'numeric' 
+                    day: 'numeric',
+                    year: 'numeric'
                 });
             } catch (error) {
                 return 'N/A';
@@ -523,15 +605,16 @@
             try {
                 const achievements = await db.collection('users').doc(userId).collection('achievements').get();
                 const data = achievements.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                console.log('User Data:', data);
-                alert(`User has ${achievements.size} achievements.\n\nCheck browser console (F12) for full details.`);
+                console.log('👤 User Data:', userId);
+                console.table(data);
+                alert(`User ID: ${userId}\n\nTotal Achievements: ${achievements.size}\n\nFull data in console (F12)`);
             } catch (error) {
                 alert('Error: ' + error.message);
             }
         }
         
-        function deleteUser(userId) {
-            if (confirm('⚠️ DELETE USER AND ALL DATA?\n\nThis cannot be undone!')) {
+        function deleteUser(userId, userEmail) {
+            if (confirm(`⚠️ DELETE USER?\n\nEmail: ${userEmail}\nID: ${userId}\n\nThis will delete ALL data!\n\nContinue?`)) {
                 db.collection('users').doc(userId).collection('achievements').get()
                     .then(snapshot => {
                         const batch = db.batch();
@@ -539,9 +622,12 @@
                         return batch.commit();
                     })
                     .then(() => {
+                        // Also delete user document
+                        return db.collection('users').doc(userId).delete();
+                    })
+                    .then(() => {
                         alert('✅ User deleted!');
-                        loadUsers();
-                        loadAchievements();
+                        // Realtime listener will auto-refresh
                     })
                     .catch(error => {
                         alert('Error: ' + error.message);
