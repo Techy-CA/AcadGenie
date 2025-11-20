@@ -1,60 +1,428 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AcadGenie Admin Panel</title>
     <style>
+        :root {
+            --primary-50: #f0f9ff;
+            --primary-100: #e0f2fe;
+            --primary-500: #3b82f6;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-600: #4b5563;
+            --gray-900: #111827;
+            --success-600: #16a34a;
+            --danger-600: #dc2626;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--gray-100) 100%);
+            min-height: 100vh;
+            color: var(--gray-900);
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .login-container {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .logo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .logo-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-header p {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--gray-900);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border: 2px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px var(--primary-50);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover { transform: translateY(-2px); }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .error-message {
+            background: #fee;
+            color: var(--danger-600);
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+            display: none;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            display: none;
             min-height: 100vh;
         }
-        .login-screen { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
-        .login-container { background: white; padding: 3rem; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); width: 100%; max-width: 400px; }
-        .login-header { text-align: center; margin-bottom: 2rem; }
-        .login-header h1 { font-size: 1.75rem; color: #1f2937; margin-bottom: 0.5rem; }
-        .login-header p { color: #6b7280; font-size: 0.875rem; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; }
-        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 1rem; }
-        .form-group input:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
-        .btn-login { width: 100%; padding: 0.875rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; }
-        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; }
-        .error-message { background: #fee2e2; color: #dc2626; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; display: none; }
-        .dashboard { display: none; padding: 2rem; background: #f3f4f6; min-height: 100vh; }
-        .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .dashboard-header h1 { color: #1f2937; font-size: 1.75rem; }
-        .btn-logout { padding: 0.625rem 1.25rem; background: #ef4444; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-left: 0.5rem; }
-        .btn-refresh { padding: 0.625rem 1.25rem; background: #10b981; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .stat-number { font-size: 2.5rem; font-weight: 700; color: #667eea; }
-        .stat-label { color: #6b7280; margin-top: 0.5rem; }
-        .section { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
-        .section h2 { margin-bottom: 1rem; color: #1f2937; }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid #e5e7eb; }
-        th { background: #f9fafb; font-weight: 600; color: #374151; font-size: 0.875rem; }
-        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-        .badge-achievement { background: #dbeafe; color: #1e40af; }
-        .badge-result { background: #d1fae5; color: #065f46; }
-        .badge-record { background: #fef3c7; color: #92400e; }
-        .btn { padding: 0.5rem 1rem; border: none; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; margin-right: 0.5rem; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-primary { background: #667eea; color: white; }
-        .loading { text-align: center; padding: 2rem; color: #6b7280; }
-        .username { font-weight: 700; color: #667eea; font-size: 1.05rem; }
+
+        .header {
+            background: white;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.875rem;
+        }
+
+        .btn-refresh {
+            background: var(--success-600);
+            color: white;
+        }
+
+        .btn-refresh:hover { background: #15803d; }
+
+        .btn-logout {
+            background: var(--danger-600);
+            color: white;
+        }
+
+        .btn-logout:hover { background: #b91c1c; }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .stat-label {
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--primary-50);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-600);
+            font-size: 1.25rem;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .section {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .section-header h2 {
+            font-size: 1.25rem;
+            color: var(--gray-900);
+        }
+
+        .section-body {
+            padding: 1.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            color: var(--gray-600);
+            font-weight: 600;
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .user-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .user-username {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .badge-achievement {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-result {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge-record {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.875rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-600);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-700);
+        }
+
+        .btn-danger {
+            background: var(--danger-600);
+            color: white;
+            margin-left: 0.5rem;
+        }
+
+        .btn-danger:hover {
+            background: #b91c1c;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--gray-600);
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .btn {
+                flex: 1;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
-            <div class="login-header">
-                <h1>🔐 Admin Login</h1>
-                <p>AcadGenie Admin Panel</p>
+            <div class="logo-header">
+                <h1>AcadGenie</h1>
+                <p>Admin Panel</p>
             </div>
             <div class="error-message" id="errorMessage"></div>
             <form id="loginForm">
@@ -66,70 +434,97 @@
                     <label>Password</label>
                     <input type="password" id="adminPassword" value="Admin@123" required>
                 </div>
-                <button type="submit" class="btn-login" id="loginBtn">Sign In</button>
+                <button type="submit" class="btn-login" id="loginBtn">Sign In to Admin Panel</button>
             </form>
         </div>
     </div>
 
+    <!-- Dashboard -->
     <div class="dashboard" id="dashboard">
-        <div class="container">
-            <div class="dashboard-header">
-                <h1>🎓 AcadGenie Admin</h1>
-                <div>
-                    <button class="btn-refresh" onclick="loadData()">🔄 Refresh</button>
-                    <button class="btn-logout" onclick="auth.signOut()">Logout</button>
+        <header class="header">
+            <div class="header-content">
+                <h1>AcadGenie Admin</h1>
+                <div class="header-actions">
+                    <button class="btn btn-refresh" onclick="loadData()">🔄 Refresh</button>
+                    <button class="btn btn-logout" onclick="auth.signOut()">Logout</button>
                 </div>
             </div>
-            
-            <div class="stats">
+        </header>
+
+        <main class="main-content">
+            <div class="stats-grid">
                 <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Users</span>
+                        <div class="stat-icon">👥</div>
+                    </div>
                     <div class="stat-number" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Total Achievements</span>
+                        <div class="stat-icon">🏆</div>
+                    </div>
                     <div class="stat-number" id="totalAchievements">0</div>
-                    <div class="stat-label">Total Achievements</div>
                 </div>
                 <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-label">Avg per User</span>
+                        <div class="stat-icon">📊</div>
+                    </div>
                     <div class="stat-number" id="avgPerUser">0</div>
-                    <div class="stat-label">Avg per User</div>
                 </div>
             </div>
 
             <div class="section">
-                <h2>All Users</h2>
-                <div id="usersLoading" class="loading">Loading...</div>
-                <table id="usersTable" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Username</th>
-                            <th>Achievements</th>
-                            <th>Latest</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="usersBody"></tbody>
-                </table>
+                <div class="section-header">
+                    <h2>All Users</h2>
+                </div>
+                <div class="section-body">
+                    <div id="usersLoading" class="loading">Loading users...</div>
+                    <table id="usersTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Achievements</th>
+                                <th>Latest Activity</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersBody"></tbody>
+                    </table>
+                    <div id="usersEmpty" class="empty-state" style="display:none;">
+                        <h3>No Users Found</h3>
+                        <p>Users will appear here once they create accounts</p>
+                    </div>
+                </div>
             </div>
 
             <div class="section">
-                <h2>Recent Achievements</h2>
-                <div id="achievementsLoading" class="loading">Loading...</div>
-                <table id="achievementsTable" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th>User</th>
-                            <th>Title</th>
-                            <th>Type</th>
-                            <th>Date</th>
-                            <th>Grade</th>
-                        </tr>
-                    </thead>
-                    <tbody id="achievementsBody"></tbody>
-                </table>
+                <div class="section-header">
+                    <h2>Recent Achievements</h2>
+                </div>
+                <div class="section-body">
+                    <div id="achievementsLoading" class="loading">Loading achievements...</div>
+                    <table id="achievementsTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>User</th>
+                                <th>Title</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody id="achievementsBody"></tbody>
+                    </table>
+                    <div id="achievementsEmpty" class="empty-state" style="display:none;">
+                        <h3>No Achievements Found</h3>
+                        <p>Achievements will appear here as users add them</p>
+                    </div>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -177,67 +572,87 @@
                 err.textContent = error.message;
                 err.style.display = 'block';
                 btn.disabled = false;
-                btn.textContent = 'Sign In';
+                btn.textContent = 'Sign In to Admin Panel';
             }
         });
         
         async function loadData() {
             try {
-                console.log('Loading all users via collectionGroup...');
+                console.log('Loading all data...');
                 
                 const allAchievements = await db.collectionGroup('achievements').get();
-                
-                console.log('Found achievements:', allAchievements.size);
                 
                 if (allAchievements.empty) {
                     document.getElementById('totalUsers').textContent = '0';
                     document.getElementById('totalAchievements').textContent = '0';
                     document.getElementById('avgPerUser').textContent = '0';
-                    document.getElementById('usersLoading').textContent = 'No data found';
-                    document.getElementById('achievementsLoading').textContent = 'No data found';
+                    document.getElementById('usersLoading').style.display = 'none';
+                    document.getElementById('usersEmpty').style.display = 'block';
+                    document.getElementById('achievementsLoading').style.display = 'none';
+                    document.getElementById('achievementsEmpty').style.display = 'block';
                     return;
                 }
                 
                 const userMap = new Map();
                 
+                // Collect all user data
                 allAchievements.forEach(doc => {
                     const path = doc.ref.path;
-                    const username = path.split('/')[1];
+                    const userId = path.split('/')[1]; // This is the UID from Firebase Auth
                     
-                    if (!userMap.has(username)) {
-                        userMap.set(username, { username, achievements: [], count: 0 });
+                    if (!userMap.has(userId)) {
+                        userMap.set(userId, {
+                            userId: userId,
+                            displayName: null,
+                            email: null,
+                            achievements: [],
+                            count: 0
+                        });
                     }
                     
-                    userMap.get(username).achievements.push(doc.data());
-                    userMap.get(username).count++;
+                    userMap.get(userId).achievements.push(doc.data());
+                    userMap.get(userId).count++;
                 });
                 
-                console.log('Total users:', userMap.size);
-                console.log('Usernames:', Array.from(userMap.keys()));
+                console.log('Users found:', userMap.size);
+                
+                // Get user details from Firebase Auth
+                for (const [userId, userData] of userMap) {
+                    try {
+                        // Try to get user info from Auth (requires Admin SDK, so fallback to stored data)
+                        // We'll use displayName from achievements if available
+                        const firstAchievement = userData.achievements[0];
+                        if (firstAchievement && firstAchievement.userName) {
+                            userData.displayName = firstAchievement.userName;
+                        }
+                        
+                        // Try to extract email from userId if it looks like an email
+                        if (userId.includes('@')) {
+                            userData.email = userId;
+                            if (!userData.displayName) {
+                                userData.displayName = userId.split('@')[0];
+                            }
+                        } else {
+                            // If userId is not email, use it as username
+                            userData.displayName = userData.displayName || userId;
+                            userData.email = userId;
+                        }
+                    } catch (e) {
+                        userData.displayName = userId;
+                        userData.email = userId;
+                    }
+                }
                 
                 document.getElementById('totalUsers').textContent = userMap.size;
                 document.getElementById('totalAchievements').textContent = allAchievements.size;
                 document.getElementById('avgPerUser').textContent = (allAchievements.size / userMap.size).toFixed(1);
                 
-                // Users table
-                const usersData = [];
-                for (const [username, data] of userMap) {
-                    const sorted = data.achievements.sort((a, b) => {
-                        const dateA = a.createdAt?.toDate() || new Date(0);
-                        const dateB = b.createdAt?.toDate() || new Date(0);
-                        return dateB - dateA;
-                    });
-                    
-                    usersData.push({
-                        username,
-                        count: data.count,
-                        latest: sorted[0].createdAt
-                    });
-                }
+                // Build users table
+                const usersData = Array.from(userMap.values());
                 
                 usersData.sort((a, b) => {
-                    const dateA = a.latest?.toDate() || new Date(0);
-                    const dateB = b.latest?.toDate() || new Date(0);
+                    const dateA = a.achievements[0]?.createdAt?.toDate() || new Date(0);
+                    const dateB = b.achievements[0]?.createdAt?.toDate() || new Date(0);
                     return dateB - dateA;
                 });
                 
@@ -247,16 +662,31 @@
                 const tbody = document.getElementById('usersBody');
                 tbody.innerHTML = '';
                 
-                usersData.forEach((user, i) => {
+                usersData.forEach((user) => {
+                    const latest = user.achievements.sort((a, b) => {
+                        const dateA = a.createdAt?.toDate() || new Date(0);
+                        const dateB = b.createdAt?.toDate() || new Date(0);
+                        return dateB - dateA;
+                    })[0];
+                    
+                    const initials = user.displayName ? user.displayName.substring(0, 2).toUpperCase() : '??';
+                    
                     tbody.innerHTML += `
                         <tr>
-                            <td>${i + 1}</td>
-                            <td><span class="username">@${user.username}</span></td>
-                            <td><strong>${user.count}</strong> entries</td>
-                            <td>${formatDate(user.latest)}</td>
                             <td>
-                                <button class="btn btn-primary" onclick="viewUser('${user.username}')">View</button>
-                                <button class="btn btn-danger" onclick="deleteUser('${user.username}')">Delete</button>
+                                <div class="user-info">
+                                    <div class="user-avatar">${initials}</div>
+                                    <div class="user-details">
+                                        <div class="user-name">${user.displayName || 'Unknown User'}</div>
+                                        <div class="user-username">@${user.email}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><strong>${user.count}</strong> entries</td>
+                            <td>${formatDate(latest?.createdAt)}</td>
+                            <td>
+                                <button class="btn-sm btn-primary" onclick="viewUser('${user.userId}', '${user.displayName}')">View</button>
+                                <button class="btn-sm btn-danger" onclick="deleteUser('${user.userId}', '${user.displayName}')">Delete</button>
                             </td>
                         </tr>
                     `;
@@ -265,8 +695,13 @@
                 // Achievements table
                 const recent = [];
                 allAchievements.forEach(doc => {
-                    const username = doc.ref.path.split('/')[1];
-                    recent.push({ username, ...doc.data() });
+                    const userId = doc.ref.path.split('/')[1];
+                    const user = userMap.get(userId);
+                    recent.push({ 
+                        userName: user.displayName,
+                        userEmail: user.email,
+                        ...doc.data() 
+                    });
                 });
                 
                 recent.sort((a, b) => {
@@ -282,9 +717,19 @@
                 aTbody.innerHTML = '';
                 
                 recent.slice(0, 20).forEach(a => {
+                    const initials = a.userName ? a.userName.substring(0, 2).toUpperCase() : '??';
+                    
                     aTbody.innerHTML += `
                         <tr>
-                            <td><span class="username">@${a.username}</span></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">${initials}</div>
+                                    <div class="user-details">
+                                        <div class="user-name">${a.userName || 'Unknown'}</div>
+                                        <div class="user-username">@${a.userEmail}</div>
+                                    </div>
+                                </div>
+                            </td>
                             <td>${a.title || 'Untitled'}</td>
                             <td><span class="badge badge-${a.type || 'achievement'}">${a.type || 'N/A'}</span></td>
                             <td>${a.date || 'N/A'}</td>
@@ -295,7 +740,7 @@
                 
             } catch (error) {
                 console.error('ERROR:', error);
-                alert('Error: ' + error.message + '\n\nMake sure Firestore rules are updated!');
+                alert('Error loading data: ' + error.message);
             }
         }
         
@@ -303,29 +748,41 @@
             if (!timestamp) return 'Never';
             try {
                 const date = timestamp.toDate();
-                return date.toLocaleDateString('en-IN', { month: 'short', day: 'numeric' });
+                const now = new Date();
+                const diff = now - date;
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (hours < 1) return 'Just now';
+                if (hours < 24) return `${hours}h ago`;
+                if (days < 7) return `${days}d ago`;
+                
+                return date.toLocaleDateString('en-IN', { 
+                    month: 'short', 
+                    day: 'numeric'
+                });
             } catch {
                 return 'N/A';
             }
         }
         
-        async function viewUser(username) {
-            const docs = await db.collection('users').doc(username).collection('achievements').get();
+        async function viewUser(userId, userName) {
+            const docs = await db.collection('users').doc(userId).collection('achievements').get();
             const data = docs.docs.map(d => d.data());
-            console.log('User:', username, data);
-            alert(`@${username}\n${docs.size} achievements\n\nCheck console (F12)`);
+            console.log('User:', userName, data);
+            alert(`${userName}\n${docs.size} achievements\n\nCheck console (F12) for details`);
         }
         
-        function deleteUser(username) {
-            if (confirm(`Delete @${username}?`)) {
-                db.collection('users').doc(username).collection('achievements').get()
+        function deleteUser(userId, userName) {
+            if (confirm(`Delete ${userName}?\n\nThis will delete ALL their achievements!`)) {
+                db.collection('users').doc(userId).collection('achievements').get()
                     .then(snap => {
                         const batch = db.batch();
                         snap.docs.forEach(doc => batch.delete(doc.ref));
                         return batch.commit();
                     })
                     .then(() => {
-                        alert('Deleted!');
+                        alert('✅ User deleted!');
                         loadData();
                     })
                     .catch(e => alert('Error: ' + e.message));
