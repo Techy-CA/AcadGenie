@@ -12,7 +12,10 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-  <!-- AUTH SCREEN -->
+  <!-- theme circle (for dark mode animation, optional) -->
+  <div class="theme-transition-circle" id="themeCircle"></div>
+
+  <!-- ================= AUTH SCREEN ================= -->
   <div class="auth-screen" id="authScreen">
     <div class="auth-container">
       <div class="auth-brand">
@@ -20,17 +23,20 @@
         <p>Track and organize your achievements</p>
       </div>
 
-      <!-- LOGIN / REGISTER WRAPPER (existing V1 forms) -->
+      <!-- LOGIN WRAPPER -->
       <div id="loginForm">
-        <!-- Tabs for Email / Phone -->
+        <!-- Tabs for email / phone -->
         <div class="auth-tabs">
           <button id="tabEmail" class="auth-tab active" type="button">Email Login</button>
           <button id="tabPhone" class="auth-tab" type="button">Phone Login</button>
         </div>
 
-        <!-- EMAIL LOGIN WRAPPER -->
+        <!-- Email login form -->
         <div id="emailLoginFormWrapper">
           <form id="loginFormElement" class="auth-form">
+            <h2>Welcome back</h2>
+            <p class="auth-subtitle">Sign in with your AcadGenie ID</p>
+
             <div class="form-group">
               <label for="loginUserId">User ID</label>
               <input type="text" id="loginUserId" placeholder="your-id" required>
@@ -39,7 +45,9 @@
               <label for="loginPassword">Password</label>
               <input type="password" id="loginPassword" placeholder="Password" required>
             </div>
+
             <button type="submit" class="btn btn-primary full-width">Sign in with Email</button>
+
             <p class="auth-link">
               New here?
               <a href="#" id="showRegisterLink">Create an account</a>
@@ -47,22 +55,31 @@
           </form>
         </div>
 
-        <!-- PHONE LOGIN WRAPPER -->
+        <!-- Phone login form -->
         <div id="phoneLoginFormWrapper" style="display:none;">
           <form id="phoneLoginForm" class="auth-form">
+            <h2>Login with phone</h2>
+            <p class="auth-subtitle">Enter your phone and verify with OTP</p>
+
             <div class="form-group">
               <label for="phoneNumber">Phone number</label>
               <input type="tel" id="phoneNumber" placeholder="+91XXXXXXXXXX" required>
             </div>
+
             <div id="recaptcha-container"></div>
-            <button type="button" id="sendOtpBtn" class="btn btn-primary full-width">Send OTP</button>
+
+            <button type="button" id="sendOtpBtn" class="btn btn-primary full-width">
+              Send OTP
+            </button>
 
             <div id="otpSection" style="display:none; margin-top:1rem;">
               <div class="form-group">
                 <label for="otpCode">Enter OTP</label>
                 <input type="text" id="otpCode" placeholder="6 digit code" maxlength="6">
               </div>
-              <button type="button" id="verifyOtpBtn" class="btn btn-primary full-width">Verify OTP</button>
+              <button type="button" id="verifyOtpBtn" class="btn btn-primary full-width">
+                Verify OTP
+              </button>
             </div>
 
             <p class="auth-link">
@@ -73,7 +90,7 @@
         </div>
       </div>
 
-      <!-- REGISTER FORM (original V1) -->
+      <!-- REGISTER WRAPPER -->
       <div id="registerForm" style="display:none;">
         <form id="registerFormElement" class="auth-form">
           <h2>Create account</h2>
@@ -83,20 +100,24 @@
             <label for="registerName">Full Name</label>
             <input type="text" id="registerName" placeholder="Your name" required>
           </div>
+
           <div class="form-group">
             <label for="registerUserId">User ID</label>
             <input type="text" id="registerUserId" placeholder="unique-id" required>
           </div>
+
           <div class="form-group">
             <label for="registerPassword">Password</label>
             <input type="password" id="registerPassword" placeholder="Minimum 6 characters" required>
           </div>
+
           <div class="form-group">
             <label for="registerConfirmPassword">Confirm Password</label>
             <input type="password" id="registerConfirmPassword" placeholder="Re-enter password" required>
           </div>
 
           <button type="submit" class="btn btn-primary full-width">Create Account</button>
+
           <p class="auth-link">
             Already have an account?
             <a href="#" id="showLoginLink">Sign in</a>
@@ -110,8 +131,9 @@
     </div>
   </div>
 
-  <!-- DASHBOARD SCREEN -->
+  <!-- ================= DASHBOARD ================= -->
   <div id="dashboardScreen" style="display:none;">
+    <!-- Header -->
     <header class="header">
       <div class="container">
         <div class="header-content">
@@ -123,18 +145,23 @@
       </div>
     </header>
 
+    <!-- Main -->
     <main class="main-content">
       <div class="container">
+        <!-- Hero -->
         <section class="hero">
           <div class="hero-content">
             <h2 class="hero-title" id="userNameDisplay">Your Academic Dashboard</h2>
-            <p class="hero-subtitle" id="welcomeMessage">Track, organize, and share your achievements</p>
+            <p class="hero-subtitle" id="welcomeMessage">
+              Track, organize, and share your achievements
+            </p>
           </div>
           <div class="hero-actions">
             <button class="btn btn-primary" id="addBtn">Add Entry</button>
           </div>
         </section>
 
+        <!-- Stats -->
         <section class="stats-grid">
           <div class="stat-card">
             <div class="stat-header">
@@ -162,6 +189,7 @@
           </div>
         </section>
 
+        <!-- Achievements -->
         <section class="section">
           <h2 class="section-title">All Achievements</h2>
           <div class="achievements-grid" id="achievementsGrid"></div>
@@ -230,7 +258,7 @@
       </div>
     </div>
 
-    <!-- Confirm + Logout Modals (as per your JS) -->
+    <!-- Confirm delete modal -->
     <div class="modal" id="confirmModal">
       <div class="modal-overlay"></div>
       <div class="modal-container modal-sm confirm-modal-container">
@@ -252,6 +280,7 @@
       </div>
     </div>
 
+    <!-- Logout modal -->
     <div class="modal" id="logoutModal">
       <div class="modal-overlay"></div>
       <div class="modal-container modal-sm confirm-modal-container">
@@ -274,6 +303,7 @@
     </div>
   </div>
 
+  <!-- JS -->
   <script src="script.js"></script>
 </body>
 </html>
