@@ -11,6 +11,10 @@ let currentView = 'grid';
 let currentSort = 'date-desc';
 let filteredAchievements = [];
 
+// NEW: phone auth state
+let recaptchaVerifier = null;
+let confirmationResultGlobal = null;
+
 // Initialize app
 auth.onAuthStateChanged((user) => {
     if (user) {
@@ -39,6 +43,16 @@ function showDashboard() {
 function showLogin() {
     document.getElementById('loginForm').style.display = 'block';
     document.getElementById('registerForm').style.display = 'none';
+
+    // default: email tab active, phone tab hidden
+    const emailWrap = document.getElementById('emailLoginFormWrapper') || document.getElementById('loginForm');
+    const phoneWrap = document.getElementById('phoneLoginFormWrapper') || document.getElementById('phoneLoginForm');
+    if (emailWrap && phoneWrap) {
+        emailWrap.style.display = 'block';
+        phoneWrap.style.display = 'none';
+    }
+    document.getElementById('tabEmail')?.classList.add('active');
+    document.getElementById('tabPhone')?.classList.remove('active');
 }
 
 function showRegister() {
@@ -193,6 +207,17 @@ const exportModal = document.getElementById('exportModal');
 const closeImportBtn = document.getElementById('closeImportBtn');
 const closeExportBtn = document.getElementById('closeExportBtn');
 
+// NEW: Phone login related DOM
+const sendOtpBtn = document.getElementById('sendOtpBtn');
+const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+const otpSection = document.getElementById('otpSection');
+const phoneInput = document.getElementById('phoneNumber');
+const otpInput = document.getElementById('otpCode');
+const tabEmailBtn = document.getElementById('tabEmail');
+const tabPhoneBtn = document.getElementById('tabPhone');
+const emailLoginWrapper = document.getElementById('emailLoginFormWrapper') || document.getElementById('loginForm');
+const phoneLoginWrapper = document.getElementById('phoneLoginFormWrapper') || document.getElementById('phoneLoginForm');
+
 // Event Listeners
 document.getElementById('loginFormElement').addEventListener('submit', handleLogin);
 document.getElementById('registerFormElement').addEventListener('submit', handleRegister);
@@ -269,6 +294,75 @@ document.getElementById('confirmDelete')?.addEventListener('click', () => {
     if (deleteConfirmCallback) deleteConfirmCallback();
     closeConfirmModal();
 });
+
+// NEW: tab actions for email / phone
+tabEmailBtn?.addEventListener('click', () => {
+    tabEmailBtn.classList.add('active');
+    tabPhoneBtn?.classList.remove('active');
+    if (emailLoginWrapper && phoneLoginWrapper) {
+        emailLoginWrapper.style.display = 'block';
+        phoneLoginWrapper.style.display = 'none';
+    }
+});
+
+tabPhoneBtn?.addEventListener('click', () => {
+    tabPhoneBtn.classList.add('active');
+    tabEmailBtn?.classList.remove('active');
+    if (emailLoginWrapper && phoneLoginWrapper) {
+        emailLoginWrapper.style.display = 'none';
+        phoneLoginWrapper.style.display = 'block';
+    }
+});
+
+// NEW: phone OTP send
+if (sendOtpBtn) {
+    sendOtpBtn.addEventListener('click', () => {
+        const phoneNumber = phoneInput.value.trim();
+        if (!phoneNumber) {
+            showNotification('Enter phone with country code, e.g. +91XXXXXXXXXX', 'error');
+            return;
+        }
+        if (!recaptchaVerifier) {
+            recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+                size: 'invisible'
+            });
+        }
+        auth.signInWithPhoneNumber(phoneNumber, recaptchaVerifier)
+            .then((confirmationResult) => {
+                confirmationResultGlobal = confirmationResult;
+                if (otpSection) otpSection.style.display = 'block';
+                showNotification('OTP sent to your phone!');
+            })
+            .catch((error) => {
+                console.error(error);
+                showNotification(error.message, 'error');
+                if (recaptchaVerifier) {
+                    recaptchaVerifier.render().then((widgetId) => {
+                        grecaptcha.reset(widgetId);
+                    });
+                }
+            });
+}
+
+// NEW: phone OTP verify
+if (verifyOtpBtn) {
+    verifyOtpBtn.addEventListener('click', () => {
+        const code = otpInput.value.trim();
+        if (!code || !confirmationResultGlobal) {
+            showNotification('Enter the OTP code.', 'error');
+            return;
+        }
+        confirmationResultGlobal.confirm(code)
+            .then((result) => {
+                // onAuthStateChanged will handle showing dashboard
+                showNotification('Phone login successful!');
+            })
+            .catch((error) => {
+                console.error(error);
+                showNotification(error.message, 'error');
+            });
+    });
+}
 
 // Modal Functions
 function openModal(achievement = null) {
@@ -354,7 +448,7 @@ function renderAchievements(data = achievements) {
                 <div class="card-menu-wrapper">
                     <button class="card-menu-btn" onclick="toggleDropdown('${achievement.id}')" aria-label="More options">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle>
+                            ircle cx="12" cy="12" r="1"></circle>ircle cx="12" cy="5" r="1"></circle>ircle cx="12" cy="19" r="1"></circle>
                         </svg>
                     </button>
                     <div class="card-menu-dropdown" id="dropdown-${achievement.id}">
