@@ -1,494 +1,170 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Achievement Portfolio - EpicApp Innovations</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AcadGenie - Academic Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Theme transition circle -->
-    <div class="theme-transition-circle" id="themeCircle"></div>
+  <!-- AUTH SCREEN -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-container">
+      <div class="auth-brand">
+        <h1>AcadGenie</h1>
+        <p>Track and organize your achievements</p>
+      </div>
 
-    <!-- Authentication Screen -->
-    <div class="auth-screen" id="authScreen">
-        <div class="auth-container">
-            <div class="auth-brand">
-                <h1>Academic Portfolio</h1>
-                <p>Track and manage your educational achievements</p>
-            </div>
+      <div class="auth-tabs">
+        <button id="tabEmail" class="auth-tab active" type="button">Email Login</button>
+        <button id="tabPhone" class="auth-tab" type="button">Phone Login</button>
+      </div>
 
-            <!-- Login Form -->
-            <div class="auth-form" id="loginForm">
-                <h2>Welcome Back</h2>
-                <p class="auth-subtitle">Sign in to continue to your dashboard</p>
-                <form id="loginFormElement">
-                    <div class="form-group">
-                        <label for="loginUserId">User ID</label>
-                        <input type="text" id="loginUserId" placeholder="Enter your user ID" required autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="current-password">
-                    </div>
-                    <button type="submit" class="btn btn-primary full-width">Sign In</button>
-                </form>
-                <p class="auth-link">Don't have an account? <a href="#" id="showRegisterLink">Create Account</a></p>
-            </div>
-
-            <!-- Register Form -->
-            <div class="auth-form" id="registerForm" style="display: none;">
-                <h2>Create Account</h2>
-                <p class="auth-subtitle">Start tracking your achievements today</p>
-                <form id="registerFormElement">
-                    <div class="form-group">
-                        <label for="registerName">Full Name</label>
-                        <input type="text" id="registerName" placeholder="Enter your full name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="registerUserId">User ID</label>
-                        <input type="text" id="registerUserId" placeholder="Choose a unique user ID" required autocomplete="username">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerPassword">Password</label>
-                        <input type="password" id="registerPassword" placeholder="Create a strong password (min 6 characters)" required autocomplete="new-password">
-                    </div>
-                    <div class="form-group">
-                        <label for="registerConfirmPassword">Confirm Password</label>
-                        <input type="password" id="registerConfirmPassword" placeholder="Confirm your password" required autocomplete="new-password">
-                    </div>
-                    <button type="submit" class="btn btn-primary full-width">Create Account</button>
-                </form>
-                <p class="auth-link">Already have an account? <a href="#" id="showLoginLink">Sign In</a></p>
-            </div>
-
-            <div class="auth-footer">
-                <p>&copy; 2025 Powered by <strong>EpicApp Innovations</strong></p>
-            </div>
+      <!-- Email Login -->
+      <form id="emailLoginForm" class="auth-form">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required>
         </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="Password" required>
+        </div>
+        <button type="submit" class="btn btn-primary full-width">Sign in with Email</button>
+      </form>
+
+      <!-- Phone Login -->
+      <form id="phoneLoginForm" class="auth-form" style="display:none;">
+        <div class="form-group">
+          <label>Phone number</label>
+          <input type="tel" id="phoneNumber" placeholder="+91XXXXXXXXXX" required>
+        </div>
+        <div id="recaptcha-container"></div>
+        <button type="button" id="sendOtpBtn" class="btn btn-primary full-width">Send OTP</button>
+
+        <div id="otpSection" style="display:none; margin-top:1rem;">
+          <div class="form-group">
+            <label>Enter OTP</label>
+            <input type="text" id="otpCode" placeholder="6 digit code" maxlength="6">
+          </div>
+          <button type="button" id="verifyOtpBtn" class="btn btn-primary full-width">Verify OTP</button>
+        </div>
+      </form>
     </div>
+  </div>
 
-    <!-- Dashboard Screen -->
-    <div id="dashboardScreen" style="display: none;">
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <h1 class="logo">Academic Portfolio</h1>
-                    <div class="header-actions">
-                        <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Toggle theme">
-                            <svg class="theme-icon sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="5"></circle>
-                                <line x1="12" y1="1" x2="12" y2="3"></line>
-                                <line x1="12" y1="21" x2="12" y2="23"></line>
-                                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-                                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-                                <line x1="1" y1="12" x2="3" y2="12"></line>
-                                <line x1="21" y1="12" x2="23" y2="12"></line>
-                                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-                                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-                            </svg>
-                            <svg class="theme-icon moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                            </svg>
-                        </button>
-                        <button class="icon-btn" id="logoutBtn" title="Logout">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                                <polyline points="16 17 21 12 16 7"></polyline>
-                                <line x1="21" y1="12" x2="9" y2="12"></line>
-                            </svg>
-                        </button>
-                        <button class="icon-btn menu-toggle" id="menuToggle" aria-label="Toggle menu">
-                            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <nav class="nav" id="mainNav">
-            <div class="container">
-                <div class="nav-buttons">
-                    <button class="nav-btn active" data-filter="all">All Entries</button>
-                    <button class="nav-btn" data-filter="achievement">Achievements</button>
-                    <button class="nav-btn" data-filter="result">Results</button>
-                    <button class="nav-btn" data-filter="record">Records</button>
-                </div>
-            </div>
-        </nav>
-
-        <main class="main-content">
-            <div class="container">
-                <section class="hero">
-                    <h2 class="hero-title"><span id="userNameDisplay">Your</span> Academic Excellence Dashboard</h2>
-                    <p class="hero-subtitle" id="welcomeMessage">Comprehensive tracking and management of educational achievements</p>
-                </section>
-
-                <div class="toolbar">
-                    <div class="search-wrapper">
-                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
-                        </svg>
-                        <input type="text" id="searchInput" placeholder="Search entries..." class="search-input">
-                    </div>
-                    <div class="sort-wrapper">
-                        <select id="sortSelect" class="sort-select">
-                            <option value="date-desc">Date: Newest First</option>
-                            <option value="date-asc">Date: Oldest First</option>
-                            <option value="title-asc">Title: A to Z</option>
-                            <option value="title-desc">Title: Z to A</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="action-bar">
-                    <button class="btn btn-primary" id="addBtn">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="12" y1="5" x2="12" y2="19"></line>
-                            <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
-                        Add Entry
-                    </button>
-                    <button class="btn btn-secondary" id="importBtn">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="7 10 12 15 17 10"></polyline>
-                            <line x1="12" y1="15" x2="12" y2="3"></line>
-                        </svg>
-                        Import
-                    </button>
-                    <button class="btn btn-secondary" id="exportBtn">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                            <polyline points="17 8 12 3 7 8"></polyline>
-                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                        </svg>
-                        Export
-                    </button>
-                    <button class="btn btn-secondary" id="backupBtn">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                            <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                            <polyline points="7 3 7 8 15 8"></polyline>
-                        </svg>
-                        Backup
-                    </button>
-                    <button class="btn btn-secondary" id="printBtn">
-                        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
-                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-                            <rect x="6" y="14" width="12" height="8"></rect>
-                        </svg>
-                        Print
-                    </button>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-label">Total Entries</span>
-                            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="18" y1="20" x2="18" y2="10"></line>
-                                <line x1="12" y1="20" x2="12" y2="4"></line>
-                                <line x1="6" y1="20" x2="6" y2="14"></line>
-                            </svg>
-                        </div>
-                        <h3 class="stat-number" id="totalCount">0</h3>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-label">Achievements</span>
-                            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="8" r="7"></circle>
-                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
-                            </svg>
-                        </div>
-                        <h3 class="stat-number" id="achievementCount">0</h3>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-label">Results</span>
-                            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                            </svg>
-                        </div>
-                        <h3 class="stat-number" id="resultCount">0</h3>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-header">
-                            <span class="stat-label">Records</span>
-                            <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                            </svg>
-                        </div>
-                        <h3 class="stat-number" id="recordCount">0</h3>
-                    </div>
-                </div>
-
-                <div class="view-controls">
-                    <div class="view-toggle">
-                        <button class="view-btn active" data-view="grid" title="Grid View">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="3" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="3" width="7" height="7"></rect>
-                                <rect x="14" y="14" width="7" height="7"></rect>
-                                <rect x="3" y="14" width="7" height="7"></rect>
-                            </svg>
-                        </button>
-                        <button class="view-btn" data-view="list" title="List View">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="8" y1="6" x2="21" y2="6"></line>
-                                <line x1="8" y1="12" x2="21" y2="12"></line>
-                                <line x1="8" y1="18" x2="21" y2="18"></line>
-                                <line x1="3" y1="6" x2="3.01" y2="6"></line>
-                                <line x1="3" y1="12" x2="3.01" y2="12"></line>
-                                <line x1="3" y1="18" x2="3.01" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="achievements-grid" id="achievementsGrid"></div>
-            </div>
-        </main>
-
-        <!-- Add/Edit Modal -->
-        <div class="modal" id="addModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="modalTitle">Add New Entry</h2>
-                    <button class="modal-close" id="closeBtn" aria-label="Close">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <form id="achievementForm" class="modal-body">
-                    <input type="hidden" id="entryId">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="entryType">Type *</label>
-                            <select id="entryType" required>
-                                <option value="">Select Type</option>
-                                <option value="achievement">Achievement</option>
-                                <option value="result">Result</option>
-                                <option value="record">Record</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="entryDate">Date *</label>
-                            <input type="date" id="entryDate" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryTitle">Title *</label>
-                        <input type="text" id="entryTitle" placeholder="Enter title" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryDescription">Description *</label>
-                        <textarea id="entryDescription" rows="4" placeholder="Enter description" required></textarea>
-                    </div>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="entryGrade">Grade/Score</label>
-                            <input type="text" id="entryGrade" placeholder="e.g., 95%, A+, 9.2 CGPA">
-                        </div>
-                        <div class="form-group">
-                            <label for="entryCategory">Category</label>
-                            <input type="text" id="entryCategory" placeholder="e.g., Computer Science">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="entryInstitution">Institution/Organization</label>
-                        <input type="text" id="entryInstitution" placeholder="Enter institution name">
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-ghost" onclick="document.getElementById('closeBtn').click()">Cancel</button>
-                        <button type="submit" class="btn btn-primary" id="submitBtn">Add Entry</button>
-                    </div>
-                </form>
-            </div>
+  <!-- DASHBOARD SCREEN -->
+  <div id="dashboardScreen" style="display:none;">
+    <header class="header">
+      <div class="container">
+        <div class="header-content">
+          <h1 class="logo">AcadGenie</h1>
+          <div class="header-actions">
+            <button class="btn btn-ghost" id="logoutBtn">Logout</button>
+          </div>
         </div>
+      </div>
+    </header>
 
-        <!-- Import Modal -->
-        <div class="modal" id="importModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h2 class="modal-title">Import Data</h2>
-                    <button class="modal-close" id="closeImportBtn" aria-label="Close">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="import-section">
-                        <h3>CSV File Import</h3>
-                        <p class="section-description">Upload a CSV file with columns: type, title, description, date, grade, institution, category</p>
-                        <div class="file-upload">
-                            <input type="file" id="csvFileInput" accept=".csv" hidden>
-                            <button class="btn btn-secondary full-width" id="uploadCsvBtn">Choose CSV File</button>
-                        </div>
-                    </div>
-                    <div class="divider"><span>OR</span></div>
-                    <div class="import-section">
-                        <h3>JSON File Import</h3>
-                        <p class="section-description">Upload a JSON file containing an array of achievement objects</p>
-                        <div class="file-upload">
-                            <input type="file" id="jsonFileInput" accept=".json" hidden>
-                            <button class="btn btn-secondary full-width" id="uploadJsonBtn">Choose JSON File</button>
-                        </div>
-                    </div>
-                    <div class="divider"><span>OR</span></div>
-                    <div class="import-section">
-                        <h3>Paste JSON Data</h3>
-                        <textarea id="jsonTextInput" class="json-input" rows="6" placeholder='[{"type":"achievement","title":"Example",...}]'></textarea>
-                        <button class="btn btn-secondary full-width" id="pasteJsonBtn">Import JSON Data</button>
-                    </div>
-                    <div class="template-section">
-                        <h3>Download Templates</h3>
-                        <div class="template-buttons">
-                            <button class="btn btn-outline" id="downloadCsvTemplate">Download CSV Template</button>
-                            <button class="btn btn-outline" id="downloadJsonTemplate">Download JSON Template</button>
-                        </div>
-                    </div>
-                </div>
+    <main class="main-content">
+      <div class="container">
+        <section class="hero">
+          <div class="hero-content">
+            <h2 class="hero-title" id="userNameDisplay">Your Academic Dashboard</h2>
+            <p class="hero-subtitle">Track, organize, and share your achievements</p>
+          </div>
+          <div class="hero-actions">
+            <button class="btn btn-primary" id="addBtn">Add Entry</button>
+          </div>
+        </section>
+
+        <section class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Total Entries</span>
             </div>
+            <h3 class="stat-number" id="totalCount">0</h3>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Achievements</span>
+            </div>
+            <h3 class="stat-number" id="achievementCount">0</h3>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Results</span>
+            </div>
+            <h3 class="stat-number" id="resultCount">0</h3>
+          </div>
+          <div class="stat-card">
+            <div class="stat-header">
+              <span class="stat-label">Records</span>
+            </div>
+            <h3 class="stat-number" id="recordCount">0</h3>
+          </div>
+        </section>
+
+        <section class="section">
+          <h2 class="section-title">All Achievements</h2>
+          <div class="achievements-grid" id="achievementsGrid"></div>
+        </section>
+      </div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="addModal">
+      <div class="modal-overlay"></div>
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title" id="modalTitle">Add New Entry</h2>
+          <button class="modal-close" id="closeBtn" aria-label="Close">&times;</button>
         </div>
-
-        <!-- Export Modal -->
-        <div class="modal" id="exportModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-container modal-sm">
-                <div class="modal-header">
-                    <h2 class="modal-title">Export Data</h2>
-                    <button class="modal-close" id="closeExportBtn" aria-label="Close">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="18" y1="6" x2="6" y2="18"></line>
-                            <line x1="6" y1="6" x2="18" y2="18"></line>
-                        </svg>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="export-options">
-                        <button class="export-option" id="exportCsvBtn">
-                            <div class="export-option-content">
-                                <h3>Export as CSV</h3>
-                                <p>Download all data in spreadsheet format</p>
-                            </div>
-                            <svg class="export-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </button>
-                        <button class="export-option" id="exportJsonBtn">
-                            <div class="export-option-content">
-                                <h3>Export as JSON</h3>
-                                <p>Download all data in JSON format</p>
-                            </div>
-                            <svg class="export-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </button>
-                        <button class="export-option" id="exportFilteredBtn">
-                            <div class="export-option-content">
-                                <h3>Export Filtered Data</h3>
-                                <p>Download currently visible entries only</p>
-                            </div>
-                            <svg class="export-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="5" y1="12" x2="19" y2="12"></line>
-                                <polyline points="12 5 19 12 12 19"></polyline>
-                            </svg>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Delete Confirmation Modal -->
-        <div class="modal" id="confirmModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-container modal-sm confirm-modal-container">
-                <div class="confirm-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                        <line x1="12" y1="9" x2="12" y2="13"></line>
-                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                    </svg>
-                </div>
-                <div class="confirm-content">
-                    <h3 class="confirm-title">Delete Entry?</h3>
-                    <p class="confirm-message">This action cannot be undone. The entry will be permanently removed from your portfolio.</p>
-                </div>
-                <div class="confirm-actions">
-                    <button class="btn btn-ghost" id="confirmCancel">Cancel</button>
-                    <button class="btn btn-danger" id="confirmDelete">Delete</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Logout Confirmation Modal -->
-        <div class="modal" id="logoutModal">
-            <div class="modal-overlay"></div>
-            <div class="modal-container modal-sm confirm-modal-container">
-                <div class="confirm-icon logout-icon">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                </div>
-                <div class="confirm-content">
-                    <h3 class="confirm-title">Logout Confirmation</h3>
-                    <p class="confirm-message">Are you sure you want to logout? Your data will be saved automatically.</p>
-                </div>
-                <div class="confirm-actions">
-                    <button class="btn btn-ghost" id="logoutCancel">Cancel</button>
-                    <button class="btn btn-primary" id="logoutConfirm">Yes, Logout</button>
-                </div>
-            </div>
-        </div>
-
-        <footer class="footer">
-            <div class="container">
-                <div class="footer-content">
-                    <p>&copy; 2025 Academic Portfolio. All Rights Reserved.</p>
-                    <p class="footer-brand">Powered by <span>EpicApp Innovations</span></p>
-                </div>
-            </div>
-        </footer>
+        <form id="achievementForm" class="modal-body">
+          <input type="hidden" id="entryId">
+          <div class="form-group">
+            <label for="entryType">Type *</label>
+            <select id="entryType" required>
+              <option value="">Select Type</option>
+              <option value="achievement">Achievement</option>
+              <option value="result">Result</option>
+              <option value="record">Record</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="entryDate">Date *</label>
+            <input type="date" id="entryDate" required>
+          </div>
+          <div class="form-group">
+            <label for="entryTitle">Title *</label>
+            <input type="text" id="entryTitle" placeholder="Enter title" required>
+          </div>
+          <div class="form-group">
+            <label for="entryDescription">Description *</label>
+            <textarea id="entryDescription" rows="3" placeholder="Describe your achievement" required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="entryGrade">Grade/Score</label>
+            <input type="text" id="entryGrade" placeholder="e.g., 95%, A+, 9.2 CGPA">
+          </div>
+          <div class="form-group">
+            <label for="entryInstitution">Institution</label>
+            <input type="text" id="entryInstitution" placeholder="College / organization">
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-ghost" id="cancelBtn">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="submitBtn">Save Entry</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    
-    <script>
-    // Firebase Configuration (UPDATED - November 2025)
-    const firebaseConfig = {
-        apiKey: "AIzaSyACDVh6WgW_frUT69i5cxCH6Gsjc2DhL8U",
-        authDomain: "acadgenie-aa1f0.firebaseapp.com",
-        projectId: "acadgenie-aa1f0",
-        storageBucket: "acadgenie-aa1f0.firebasestorage.app",
-        messagingSenderId: "960534024344",
-        appId: "1:960534024344:web:c71536afec7e1492e640ed",
-        measurementId: "G-ZZ5XCFSVLG"
-    };
-    
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-</script>
-    
-    <script src="script.js"></script>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>
